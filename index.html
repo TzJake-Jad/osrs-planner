@@ -201,7 +201,8 @@ const PRICES={
   "Uncut diamond":2700,"Uncut dragonstone":12000,
   "Mithril ore":130,"Adamantite ore":900,
   "Kwuarm":900,"Limpwurt root":150,"Cadantine":1400,"White berries":400,"Dwarf weed":700,"Wine of zamorak":2000,
-  "Redwood logs":350
+  "Redwood logs":350,
+  "Raw summer pie":250,"Mithril dart tip":8,"Molten glass":90,"Adamant bar":1400,"Lantadyme":1500,"Potato cactus":400
 };
 
 const SKILLS=[
@@ -212,7 +213,8 @@ const SKILLS=[
     {name:"Cook lobsters (120xp)",req:40,legs:[{from:40,to:99,xpPer:120,items:[{name:"Raw lobster",per:1}]}]},
     {name:"Cook swordfish (140xp)",req:45,legs:[{from:45,to:99,xpPer:140,items:[{name:"Raw swordfish",per:1}]}]},
     {name:"Cook monkfish (150xp)",req:62,legs:[{from:62,to:99,xpPer:150,items:[{name:"Raw monkfish",per:1}]}]},
-    {name:"Cook anglerfish (230xp)",req:84,legs:[{from:84,to:99,xpPer:230,items:[{name:"Raw anglerfish",per:1}]}]}
+    {name:"Cook anglerfish (230xp)",req:84,legs:[{from:84,to:99,xpPer:230,items:[{name:"Raw anglerfish",per:1}]}]},
+    {name:"Summer pies (260xp)",req:95,legs:[{from:95,to:99,xpPer:260,items:[{name:"Raw summer pie",per:1}]}]}
   ]},
   {name:"Fletching",cur:408813,sel:0,methods:[
     {name:"Yew longbows (135xp)",req:70,legs:[{from:70,to:99,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]}]},
@@ -220,7 +222,8 @@ const SKILLS=[
     {name:"Adamant darts (15xp)",req:61,legs:[{from:61,to:99,xpPer:15,items:[{name:"Adamant dart tip",per:1},{name:"Feather",per:1}]}]},
     {name:"Rune darts (18.8xp)",req:81,legs:[{from:81,to:99,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]}]},
     {name:"Maple longbows (116.6xp)",req:55,legs:[{from:55,to:99,xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]}]},
-    {name:"Dragon darts (25xp)",req:95,legs:[{from:95,to:99,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]}
+    {name:"Dragon darts (25xp)",req:95,legs:[{from:95,to:99,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]},
+    {name:"Mithril darts (11.2xp)",req:52,legs:[{from:52,to:99,xpPer:11.2,items:[{name:"Mithril dart tip",per:1},{name:"Feather",per:1}]}]}
   ]},
   {name:"Crafting",cur:3002,sel:0,methods:[
     {name:"Green d'hide bodies (148xp)",req:63,legs:[{from:63,to:99,xpPer:148,items:[{name:"Green dragon leather",per:3}]}]},
@@ -229,7 +232,8 @@ const SKILLS=[
     {name:"Black d'hide bodies (306xp)",req:79,legs:[{from:79,to:99,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]},
     {name:"Air battlestaves (137.5xp)",req:66,legs:[{from:66,to:99,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]}]},
     {name:"Cut diamonds (107.5xp)",req:43,legs:[{from:43,to:99,xpPer:107.5,items:[{name:"Uncut diamond",per:1}]}]},
-    {name:"Cut dragonstones (137.5xp)",req:55,legs:[{from:55,to:99,xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]}
+    {name:"Cut dragonstones (137.5xp)",req:55,legs:[{from:55,to:99,xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]},
+    {name:"Empty light orbs (70xp)",req:87,legs:[{from:87,to:99,xpPer:70,items:[{name:"Molten glass",per:1}]}]}
   ]},
   {name:"Smithing",cur:12743,sel:0,methods:[
     {name:"Gold bars — BF (56.2xp)",req:40,legs:[{from:40,to:99,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
@@ -237,7 +241,8 @@ const SKILLS=[
     {name:"Rune bars — BF (50xp)",req:85,legs:[{from:85,to:99,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]},
     {name:"Cannonballs (25.6xp)",req:35,legs:[{from:35,to:99,xpPer:25.6,items:[{name:"Steel bar",per:1}]}]},
     {name:"Mithril bars — BF (30xp)",req:50,legs:[{from:50,to:99,xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]}]},
-    {name:"Adamant bars — BF (37.5xp)",req:70,legs:[{from:70,to:99,xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]}]}
+    {name:"Adamant bars — BF (37.5xp)",req:70,legs:[{from:70,to:99,xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]}]},
+    {name:"Adamant platebodies (187.5xp)",req:88,legs:[{from:88,to:99,xpPer:187.5,items:[{name:"Adamant bar",per:5}]}]}
   ]},
   {name:"Herblore",cur:4045,sel:0,methods:[
     {name:"Prayer potions (142.5xp)",req:38,legs:[{from:38,to:99,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]}]},
@@ -246,7 +251,8 @@ const SKILLS=[
     {name:"Super combat (150xp)",req:90,legs:[{from:90,to:99,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]},
     {name:"Super strength (125xp)",req:55,legs:[{from:55,to:99,xpPer:125,items:[{name:"Kwuarm",per:1},{name:"Limpwurt root",per:1}]}]},
     {name:"Super defence (150xp)",req:66,legs:[{from:66,to:99,xpPer:150,items:[{name:"Cadantine",per:1},{name:"White berries",per:1}]}]},
-    {name:"Ranging potions (162.5xp)",req:72,legs:[{from:72,to:99,xpPer:162.5,items:[{name:"Dwarf weed",per:1},{name:"Wine of zamorak",per:1}]}]}
+    {name:"Ranging potions (162.5xp)",req:72,legs:[{from:72,to:99,xpPer:162.5,items:[{name:"Dwarf weed",per:1},{name:"Wine of zamorak",per:1}]}]},
+    {name:"Magic potions (172.5xp)",req:76,legs:[{from:76,to:99,xpPer:172.5,items:[{name:"Lantadyme",per:1},{name:"Potato cactus",per:1}]}]}
   ]},
   {name:"Construction",cur:939,sel:0,methods:[
     {name:"Oak larders → Mahogany tables",req:33,legs:[
