@@ -211,7 +211,13 @@ const PRICES={
   "Mithril ore":130,"Adamantite ore":900,
   "Kwuarm":900,"Limpwurt root":150,"Cadantine":1400,"White berries":400,"Dwarf weed":700,"Wine of zamorak":2000,
   "Redwood logs":350,
-  "Raw summer pie":250,"Mithril dart tip":8,"Molten glass":90,"Adamant bar":1400,"Lantadyme":1500,"Potato cactus":400
+  "Raw summer pie":250,"Mithril dart tip":8,"Molten glass":90,"Adamant bar":1400,"Lantadyme":1500,"Potato cactus":400,
+  "Leather":50,"Uncut sapphire":900,"Uncut emerald":600,"Uncut ruby":1000,
+  "Raw shrimps":20,"Raw trout":30,"Raw salmon":40,
+  "Logs":60,"Oak logs":30,
+  "Copper ore":45,"Tin ore":45,
+  "Guam leaf":20,"Eye of newt":15,"Tarromin":100,
+  "Plank":100
 };
 
 // OSRS item IDs for live GE price lookups via the wiki prices API.
@@ -230,11 +236,22 @@ const ITEM_IDS={
   "Mithril ore":447,"Adamantite ore":449,
   "Kwuarm":263,"Limpwurt root":225,"Cadantine":265,"White berries":239,"Dwarf weed":267,"Wine of zamorak":245,
   "Redwood logs":19669,
-  "Raw summer pie":7176,"Mithril dart tip":823,"Molten glass":1775,"Adamant bar":2361,"Lantadyme":2481,"Potato cactus":3138
+  "Raw summer pie":7176,"Mithril dart tip":823,"Molten glass":1775,"Adamant bar":2361,"Lantadyme":2481,"Potato cactus":3138,
+  "Leather":1741,"Uncut sapphire":1623,"Uncut emerald":1621,"Uncut ruby":1619,
+  "Raw shrimps":317,"Raw trout":335,"Raw salmon":331,
+  "Logs":1511,"Oak logs":1521,
+  "Copper ore":436,"Tin ore":438,
+  "Guam leaf":249,"Eye of newt":221,"Tarromin":259,
+  "Plank":960
 };
 
 const SKILLS=[
   {name:"Cooking",cur:2753655,sel:0,methods:[
+    {name:"Full 1→99 — fish → karambwans",req:1,legs:[
+      {from:1,to:15,xpPer:30,items:[{name:"Raw shrimps",per:1}]},
+      {from:15,to:25,xpPer:70,items:[{name:"Raw trout",per:1}]},
+      {from:25,to:30,xpPer:90,items:[{name:"Raw salmon",per:1}]},
+      {from:30,to:99,xpPer:190,items:[{name:"Raw karambwan",per:1}]}]},
     {name:"Raw karambwan (190xp)",req:30,legs:[{from:30,to:99,xpPer:190,items:[{name:"Raw karambwan",per:1}]}]},
     {name:"Jugs of wine (200xp)",req:35,legs:[{from:35,to:99,xpPer:200,items:[{name:"Grapes",per:1},{name:"Jug of water",per:1}]}]},
     {name:"Cook sharks (210xp)",req:80,legs:[{from:80,to:99,xpPer:210,items:[{name:"Raw shark",per:1}]}]},
@@ -245,6 +262,12 @@ const SKILLS=[
     {name:"Summer pies (260xp)",req:95,legs:[{from:95,to:99,xpPer:260,items:[{name:"Raw summer pie",per:1}]}]}
   ]},
   {name:"Fletching",cur:408813,sel:0,methods:[
+    {name:"Full 1→99 — bows (cut + string)",req:1,legs:[
+      {from:1,to:20,xpPer:10,items:[{name:"Logs",per:1},{name:"Bow string",per:1}]},
+      {from:20,to:40,xpPer:33,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]},
+      {from:40,to:55,xpPer:83,items:[{name:"Willow logs",per:1},{name:"Bow string",per:1}]},
+      {from:55,to:70,xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]},
+      {from:70,to:99,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]}]},
     {name:"Yew longbows (135xp)",req:70,legs:[{from:70,to:99,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]}]},
     {name:"Magic longbows (183xp)",req:85,legs:[{from:85,to:99,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]}]},
     {name:"Adamant darts (15xp)",req:61,legs:[{from:61,to:99,xpPer:15,items:[{name:"Adamant dart tip",per:1},{name:"Feather",per:1}]}]},
@@ -254,6 +277,16 @@ const SKILLS=[
     {name:"Mithril darts (11.2xp)",req:52,legs:[{from:52,to:99,xpPer:11.2,items:[{name:"Mithril dart tip",per:1},{name:"Feather",per:1}]}]}
   ]},
   {name:"Crafting",cur:3002,sel:0,methods:[
+    {name:"Full 1→99 — leather → gems → d'hide",req:1,legs:[
+      {from:1,to:20,xpPer:13.8,items:[{name:"Leather",per:1}]},
+      {from:20,to:27,xpPer:50,items:[{name:"Uncut sapphire",per:1}]},
+      {from:27,to:34,xpPer:67.5,items:[{name:"Uncut emerald",per:1}]},
+      {from:34,to:43,xpPer:85,items:[{name:"Uncut ruby",per:1}]},
+      {from:43,to:63,xpPer:107.5,items:[{name:"Uncut diamond",per:1}]},
+      {from:63,to:66,xpPer:148,items:[{name:"Green dragon leather",per:3}]},
+      {from:66,to:73,xpPer:210,items:[{name:"Blue dragon leather",per:3}]},
+      {from:73,to:79,xpPer:258,items:[{name:"Red dragon leather",per:3}]},
+      {from:79,to:99,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]},
     {name:"Green d'hide bodies (148xp)",req:63,legs:[{from:63,to:99,xpPer:148,items:[{name:"Green dragon leather",per:3}]}]},
     {name:"Blue d'hide bodies (210xp)",req:66,legs:[{from:66,to:99,xpPer:210,items:[{name:"Blue dragon leather",per:3}]}]},
     {name:"Red d'hide bodies (258xp)",req:73,legs:[{from:73,to:99,xpPer:258,items:[{name:"Red dragon leather",per:3}]}]},
@@ -264,6 +297,10 @@ const SKILLS=[
     {name:"Empty light orbs (70xp)",req:87,legs:[{from:87,to:99,xpPer:70,items:[{name:"Molten glass",per:1}]}]}
   ]},
   {name:"Smithing",cur:12743,sel:0,methods:[
+    {name:"Full 1→99 — bars (Blast Furnace)",req:1,legs:[
+      {from:1,to:30,xpPer:6.2,items:[{name:"Copper ore",per:1},{name:"Tin ore",per:1}]},
+      {from:30,to:40,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]},
+      {from:40,to:99,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
     {name:"Gold bars — BF (56.2xp)",req:40,legs:[{from:40,to:99,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
     {name:"Steel bars — BF (17.5xp)",req:30,legs:[{from:30,to:99,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]}]},
     {name:"Rune bars — BF (50xp)",req:85,legs:[{from:85,to:99,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]},
@@ -273,6 +310,10 @@ const SKILLS=[
     {name:"Adamant platebodies (187.5xp)",req:88,legs:[{from:88,to:99,xpPer:187.5,items:[{name:"Adamant bar",per:5}]}]}
   ]},
   {name:"Herblore",cur:4045,sel:0,methods:[
+    {name:"Full 1→99 — potions",req:1,legs:[
+      {from:1,to:12,xpPer:25,items:[{name:"Guam leaf",per:1},{name:"Eye of newt",per:1}]},
+      {from:12,to:38,xpPer:50,items:[{name:"Tarromin",per:1},{name:"Limpwurt root",per:1}]},
+      {from:38,to:99,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]}]},
     {name:"Prayer potions (142.5xp)",req:38,legs:[{from:38,to:99,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]}]},
     {name:"Super restores (142.5xp)",req:63,legs:[{from:63,to:99,xpPer:142.5,items:[{name:"Snapdragon",per:1},{name:"Red spiders' eggs",per:1}]}]},
     {name:"Saradomin brews (180xp)",req:81,legs:[{from:81,to:99,xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]}]},
@@ -283,6 +324,10 @@ const SKILLS=[
     {name:"Magic potions (172.5xp)",req:76,legs:[{from:76,to:99,xpPer:172.5,items:[{name:"Lantadyme",per:1},{name:"Potato cactus",per:1}]}]}
   ]},
   {name:"Construction",cur:939,sel:0,methods:[
+    {name:"Full 1→99 — planks",req:1,legs:[
+      {from:1,to:33,xpPer:58,items:[{name:"Plank",per:2}]},
+      {from:33,to:52,xpPer:480,items:[{name:"Oak plank",per:8}]},
+      {from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]},
     {name:"Oak larders → Mahogany tables",req:33,legs:[
       {from:33,to:52,xpPer:480,items:[{name:"Oak plank",per:8}]},
       {from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]},
@@ -290,6 +335,13 @@ const SKILLS=[
     {name:"Mahogany tables (from 52)",req:52,legs:[{from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]}
   ]},
   {name:"Firemaking",cur:101470,sel:0,methods:[
+    {name:"Full 1→99 — burn logs",req:1,legs:[
+      {from:1,to:15,xpPer:40,items:[{name:"Logs",per:1}]},
+      {from:15,to:30,xpPer:60,items:[{name:"Oak logs",per:1}]},
+      {from:30,to:45,xpPer:90,items:[{name:"Willow logs",per:1}]},
+      {from:45,to:60,xpPer:135,items:[{name:"Maple logs",per:1}]},
+      {from:60,to:75,xpPer:202.5,items:[{name:"Yew logs",per:1}]},
+      {from:75,to:99,xpPer:303.8,items:[{name:"Magic logs",per:1}]}]},
     {name:"Wintertodt (free)",req:50,legs:[{from:50,to:99,xpPer:0,items:[]}]},
     {name:"Burn magic logs (303.8xp)",req:50,legs:[{from:50,to:99,xpPer:303.8,items:[{name:"Magic logs",per:1}]}]},
     {name:"Burn yew logs (202.5xp)",req:50,legs:[{from:50,to:99,xpPer:202.5,items:[{name:"Yew logs",per:1}]}]},
