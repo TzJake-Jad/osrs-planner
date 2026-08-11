@@ -48,6 +48,8 @@
   .coins{color:var(--gold-bright)}
   .note{font-size:12.5px;color:var(--muted);margin:12px 2px 0}
   .note b{color:var(--parch);font-weight:600}
+  .shop-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 2px 12px}
+  .shop-tools .status{margin-top:0}
 
   section{margin-top:30px}
   .sec-title{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 2px 12px;display:flex;align-items:center;gap:10px}
@@ -146,16 +148,20 @@
     <div><div class="lbl">Total supply cost</div><div class="big" id="grand-compact">—</div></div>
     <div style="align-self:flex-end"><div class="exact" id="grand-exact"></div></div>
   </div>
-  <p class="note" id="head-note"></p>
 
   <section>
     <h2 class="sec-title">Consolidated shopping list</h2>
+    <div class="shop-tools">
+      <button class="act" id="btn-prices">Fetch live GE prices</button>
+      <button class="act ghost" id="btn-copy">Copy list</button>
+      <span class="status info" id="price-status"></span>
+    </div>
     <table class="shop">
       <thead><tr><th>Item</th><th class="num">Total qty</th><th class="num">Unit price (gp)</th><th class="num">Subtotal</th></tr></thead>
       <tbody id="shop-body"></tbody>
       <tfoot><tr><td>Grand total</td><td class="num qty" id="foot-qty"></td><td class="num"></td><td class="num" id="foot-cost"></td></tr></tfoot>
     </table>
-    <p class="note">Quantities use OSRS stack colours: <span style="color:var(--stack-yellow)">yellow</span> &lt;100k · <span style="color:var(--stack-white)">white</span> 100k–10m · <span style="color:var(--stack-green)">green</span> 10m+. Edit a unit price once here and it applies everywhere.</p>
+    <p class="note">Sorted by subtotal. Quantities use OSRS stack colours: <span style="color:var(--stack-yellow)">yellow</span> &lt;100k · <span style="color:var(--stack-white)">white</span> 100k–10m · <span style="color:var(--stack-green)">green</span> 10m+. Edit a unit price once here and it applies everywhere, or pull live GE prices above.</p>
   </section>
 
   <section>
@@ -196,39 +202,83 @@ const PRICES={
   "Gold ore":180,"Iron ore":120,"Coal":150,"Runite ore":11000,"Steel bar":480,
   "Ranarr weed":7500,"Snape grass":250,"Snapdragon":9000,"Red spiders' eggs":900,
   "Toadflax":3000,"Crushed nest":3500,"Super attack(4)":1000,"Super strength(4)":1200,"Super defence(4)":1100,"Torstol":6000,
-  "Oak plank":450,"Mahogany plank":1900
+  "Oak plank":450,"Mahogany plank":1900,
+  "Raw lobster":150,"Raw swordfish":250,"Raw monkfish":350,"Raw anglerfish":1500,
+  "Dragon dart tip":60,
+  "Uncut diamond":2700,"Uncut dragonstone":12000,
+  "Mithril ore":130,"Adamantite ore":900,
+  "Kwuarm":900,"Limpwurt root":150,"Cadantine":1400,"White berries":400,"Dwarf weed":700,"Wine of zamorak":2000,
+  "Redwood logs":350,
+  "Raw summer pie":250,"Mithril dart tip":8,"Molten glass":90,"Adamant bar":1400,"Lantadyme":1500,"Potato cactus":400
+};
+
+// OSRS item IDs for live GE price lookups via the wiki prices API.
+const ITEM_IDS={
+  "Raw karambwan":3142,"Grapes":1987,"Jug of water":1937,"Raw shark":383,
+  "Yew logs":1515,"Magic logs":1513,"Maple logs":1517,"Willow logs":1519,"Bow string":1777,
+  "Adamant dart tip":821,"Rune dart tip":822,"Feather":314,
+  "Green dragon leather":1745,"Blue dragon leather":2505,"Red dragon leather":2507,"Black dragon leather":2509,
+  "Battlestaff":1391,"Air orb":573,
+  "Gold ore":444,"Iron ore":440,"Coal":453,"Runite ore":451,"Steel bar":2353,
+  "Ranarr weed":257,"Snape grass":231,"Snapdragon":3000,"Red spiders' eggs":223,
+  "Toadflax":2998,"Crushed nest":6693,"Super attack(4)":2436,"Super strength(4)":2440,"Super defence(4)":2442,"Torstol":269,
+  "Oak plank":8778,"Mahogany plank":8782,
+  "Raw lobster":377,"Raw swordfish":371,"Raw monkfish":7944,"Raw anglerfish":13439,
+  "Dragon dart tip":11232,"Uncut diamond":1617,"Uncut dragonstone":1631,
+  "Mithril ore":447,"Adamantite ore":449,
+  "Kwuarm":263,"Limpwurt root":225,"Cadantine":265,"White berries":239,"Dwarf weed":267,"Wine of zamorak":245,
+  "Redwood logs":19669,
+  "Raw summer pie":7176,"Mithril dart tip":823,"Molten glass":1775,"Adamant bar":2361,"Lantadyme":2481,"Potato cactus":3138
 };
 
 const SKILLS=[
   {name:"Cooking",cur:2753655,sel:0,methods:[
     {name:"Raw karambwan (190xp)",req:30,legs:[{from:30,to:99,xpPer:190,items:[{name:"Raw karambwan",per:1}]}]},
     {name:"Jugs of wine (200xp)",req:35,legs:[{from:35,to:99,xpPer:200,items:[{name:"Grapes",per:1},{name:"Jug of water",per:1}]}]},
-    {name:"Cook sharks (210xp)",req:80,legs:[{from:80,to:99,xpPer:210,items:[{name:"Raw shark",per:1}]}]}
+    {name:"Cook sharks (210xp)",req:80,legs:[{from:80,to:99,xpPer:210,items:[{name:"Raw shark",per:1}]}]},
+    {name:"Cook lobsters (120xp)",req:40,legs:[{from:40,to:99,xpPer:120,items:[{name:"Raw lobster",per:1}]}]},
+    {name:"Cook swordfish (140xp)",req:45,legs:[{from:45,to:99,xpPer:140,items:[{name:"Raw swordfish",per:1}]}]},
+    {name:"Cook monkfish (150xp)",req:62,legs:[{from:62,to:99,xpPer:150,items:[{name:"Raw monkfish",per:1}]}]},
+    {name:"Cook anglerfish (230xp)",req:84,legs:[{from:84,to:99,xpPer:230,items:[{name:"Raw anglerfish",per:1}]}]},
+    {name:"Summer pies (260xp)",req:95,legs:[{from:95,to:99,xpPer:260,items:[{name:"Raw summer pie",per:1}]}]}
   ]},
   {name:"Fletching",cur:408813,sel:0,methods:[
     {name:"Yew longbows (135xp)",req:70,legs:[{from:70,to:99,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]}]},
     {name:"Magic longbows (183xp)",req:85,legs:[{from:85,to:99,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]}]},
     {name:"Adamant darts (15xp)",req:61,legs:[{from:61,to:99,xpPer:15,items:[{name:"Adamant dart tip",per:1},{name:"Feather",per:1}]}]},
-    {name:"Rune darts (18.8xp)",req:81,legs:[{from:81,to:99,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]}]}
+    {name:"Rune darts (18.8xp)",req:81,legs:[{from:81,to:99,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]}]},
+    {name:"Maple longbows (116.6xp)",req:55,legs:[{from:55,to:99,xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]}]},
+    {name:"Dragon darts (25xp)",req:95,legs:[{from:95,to:99,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]},
+    {name:"Mithril darts (11.2xp)",req:52,legs:[{from:52,to:99,xpPer:11.2,items:[{name:"Mithril dart tip",per:1},{name:"Feather",per:1}]}]}
   ]},
   {name:"Crafting",cur:3002,sel:0,methods:[
     {name:"Green d'hide bodies (148xp)",req:63,legs:[{from:63,to:99,xpPer:148,items:[{name:"Green dragon leather",per:3}]}]},
     {name:"Blue d'hide bodies (210xp)",req:66,legs:[{from:66,to:99,xpPer:210,items:[{name:"Blue dragon leather",per:3}]}]},
     {name:"Red d'hide bodies (258xp)",req:73,legs:[{from:73,to:99,xpPer:258,items:[{name:"Red dragon leather",per:3}]}]},
     {name:"Black d'hide bodies (306xp)",req:79,legs:[{from:79,to:99,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]},
-    {name:"Air battlestaves (137.5xp)",req:66,legs:[{from:66,to:99,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]}]}
+    {name:"Air battlestaves (137.5xp)",req:66,legs:[{from:66,to:99,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]}]},
+    {name:"Cut diamonds (107.5xp)",req:43,legs:[{from:43,to:99,xpPer:107.5,items:[{name:"Uncut diamond",per:1}]}]},
+    {name:"Cut dragonstones (137.5xp)",req:55,legs:[{from:55,to:99,xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]},
+    {name:"Empty light orbs (70xp)",req:87,legs:[{from:87,to:99,xpPer:70,items:[{name:"Molten glass",per:1}]}]}
   ]},
   {name:"Smithing",cur:12743,sel:0,methods:[
     {name:"Gold bars — BF (56.2xp)",req:40,legs:[{from:40,to:99,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
     {name:"Steel bars — BF (17.5xp)",req:30,legs:[{from:30,to:99,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]}]},
     {name:"Rune bars — BF (50xp)",req:85,legs:[{from:85,to:99,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]},
-    {name:"Cannonballs (25.6xp)",req:35,legs:[{from:35,to:99,xpPer:25.6,items:[{name:"Steel bar",per:1}]}]}
+    {name:"Cannonballs (25.6xp)",req:35,legs:[{from:35,to:99,xpPer:25.6,items:[{name:"Steel bar",per:1}]}]},
+    {name:"Mithril bars — BF (30xp)",req:50,legs:[{from:50,to:99,xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]}]},
+    {name:"Adamant bars — BF (37.5xp)",req:70,legs:[{from:70,to:99,xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]}]},
+    {name:"Adamant platebodies (187.5xp)",req:88,legs:[{from:88,to:99,xpPer:187.5,items:[{name:"Adamant bar",per:5}]}]}
   ]},
   {name:"Herblore",cur:4045,sel:0,methods:[
     {name:"Prayer potions (142.5xp)",req:38,legs:[{from:38,to:99,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]}]},
     {name:"Super restores (142.5xp)",req:63,legs:[{from:63,to:99,xpPer:142.5,items:[{name:"Snapdragon",per:1},{name:"Red spiders' eggs",per:1}]}]},
     {name:"Saradomin brews (180xp)",req:81,legs:[{from:81,to:99,xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]}]},
-    {name:"Super combat (150xp)",req:90,legs:[{from:90,to:99,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]}
+    {name:"Super combat (150xp)",req:90,legs:[{from:90,to:99,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]},
+    {name:"Super strength (125xp)",req:55,legs:[{from:55,to:99,xpPer:125,items:[{name:"Kwuarm",per:1},{name:"Limpwurt root",per:1}]}]},
+    {name:"Super defence (150xp)",req:66,legs:[{from:66,to:99,xpPer:150,items:[{name:"Cadantine",per:1},{name:"White berries",per:1}]}]},
+    {name:"Ranging potions (162.5xp)",req:72,legs:[{from:72,to:99,xpPer:162.5,items:[{name:"Dwarf weed",per:1},{name:"Wine of zamorak",per:1}]}]},
+    {name:"Magic potions (172.5xp)",req:76,legs:[{from:76,to:99,xpPer:172.5,items:[{name:"Lantadyme",per:1},{name:"Potato cactus",per:1}]}]}
   ]},
   {name:"Construction",cur:939,sel:0,methods:[
     {name:"Oak larders → Mahogany tables",req:33,legs:[
@@ -242,7 +292,8 @@ const SKILLS=[
     {name:"Burn magic logs (303.8xp)",req:50,legs:[{from:50,to:99,xpPer:303.8,items:[{name:"Magic logs",per:1}]}]},
     {name:"Burn yew logs (202.5xp)",req:50,legs:[{from:50,to:99,xpPer:202.5,items:[{name:"Yew logs",per:1}]}]},
     {name:"Burn maple logs (135xp)",req:50,legs:[{from:50,to:99,xpPer:135,items:[{name:"Maple logs",per:1}]}]},
-    {name:"Burn willow logs (90xp)",req:50,legs:[{from:50,to:99,xpPer:90,items:[{name:"Willow logs",per:1}]}]}
+    {name:"Burn willow logs (90xp)",req:50,legs:[{from:50,to:99,xpPer:90,items:[{name:"Willow logs",per:1}]}]},
+    {name:"Burn redwood logs (350xp)",req:90,legs:[{from:90,to:99,xpPer:350,items:[{name:"Redwood logs",per:1}]}]}
   ]}
 ];
 const GATHER=[
@@ -283,7 +334,7 @@ function compute(){
 
 function renderSkills(){
   document.getElementById("skills").innerHTML=SKILLS.map((sk,si)=>{
-    const lvl=levelFromXp(sk.cur),rem=XP99-sk.cur,m=sel(sk);
+    const lvl=levelFromXp(sk.cur),rem=Math.max(0,XP99-sk.cur),m=sel(sk);
     const firstFrom=Math.min(...m.legs.map(l=>l.from));
     const gap=firstFrom>lvl?`<span class="gap-flag">↳ lvl ${lvl}→${firstFrom} not costed</span>`:"";
     const opts=sk.methods.map((mm,i)=>`<option value="${i}" ${i===sk.sel?"selected":""}>${mm.name}</option>`).join("");
@@ -304,7 +355,7 @@ function renderSkills(){
         <div class="skill-head">
           <span class="skill-name">${sk.name}</span>
           <span class="lvl-wrap">lvl <input class="lvl-in" type="number" min="1" max="99" data-lvl="${si}" value="${lvl}"> → 99</span>
-          <span class="xp-rem">${fmt(rem)} xp to go</span>
+          <span class="xp-rem">${rem>0?fmt(rem)+" xp to go":"99 — done"}</span>
           <span class="skill-sub" data-out="sub-${si}"></span>
         </div>
         <div class="method-bar"><label>Method</label><select class="method" data-si="${si}">${opts}</select>${gap}</div>
@@ -314,7 +365,7 @@ function renderSkills(){
 
 let SHOP_ITEMS=[];
 function renderShop(itemTotals){
-  SHOP_ITEMS=Object.keys(itemTotals);
+  SHOP_ITEMS=Object.keys(itemTotals).sort((a,b)=>(itemTotals[b]*(PRICES[b]||0))-(itemTotals[a]*(PRICES[a]||0)));
   document.getElementById("shop-body").innerHTML=SHOP_ITEMS.map(name=>`
     <tr><td class="itemname">${name}</td><td class="num qty" data-out="shopqty-${name}"></td>
       <td class="num"><input class="price-in" type="number" min="0" step="1" data-price="${name}" value="${PRICES[name]||0}"></td>
@@ -322,12 +373,12 @@ function renderShop(itemTotals){
 }
 function renderGather(){
   document.getElementById("gather").innerHTML=GATHER.map(g=>{
-    const lvl=levelFromXp(g.cur);
-    return `<div class="mini-card"><div class="nm">${g.name}</div><div class="rw">${lvl} → 99 · ${fmt(XP99-g.cur)} xp</div><div class="mini-note">Gathered, not bought — no shopping list.</div></div>`;
+    const lvl=levelFromXp(g.cur),rem=Math.max(0,XP99-g.cur);
+    return `<div class="mini-card"><div class="nm">${g.name}</div><div class="rw">${lvl} → 99 · ${rem>0?fmt(rem)+" xp":"done"}</div><div class="mini-note">Gathered, not bought — no shopping list.</div></div>`;
   }).join("");
   document.getElementById("special").innerHTML=SPECIAL.map(s=>{
-    const lvl=levelFromXp(s.cur),cls=s.kind==="blocked"?"blocked":"special",tag=s.kind==="blocked"?"blocked":"planning note";
-    return `<div class="mini-card ${cls}"><div class="tag">${tag}</div><div class="nm">${s.name}</div><div class="rw">${lvl} → 99 · ${fmt(XP99-s.cur)} xp</div><div class="mini-note">${s.note}</div></div>`;
+    const lvl=levelFromXp(s.cur),rem=Math.max(0,XP99-s.cur),cls=s.kind==="blocked"?"blocked":"special",tag=s.kind==="blocked"?"blocked":"planning note";
+    return `<div class="mini-card ${cls}"><div class="tag">${tag}</div><div class="nm">${s.name}</div><div class="rw">${lvl} → 99 · ${rem>0?fmt(rem)+" xp":"done"}</div><div class="mini-note">${s.note}</div></div>`;
   }).join("");
 }
 
@@ -361,8 +412,6 @@ function refresh(){
   });
   document.getElementById("foot-qty").textContent=fmt(fq);
   document.getElementById("foot-cost").textContent=fmt(fc);
-  const rank=Object.entries(itemTotals).map(([n,q])=>[n,q*(PRICES[n]||0)]).sort((a,b)=>b[1]-a[1]).slice(0,3).filter(x=>x[1]>0).map(([n,c])=>`${n} (${gpCompact(c)})`);
-  document.getElementById("head-note").innerHTML=rank.length?`Biggest cost drivers now: <b>${rank.join(" · ")}</b>. Herblore &amp; Smithing recoup most of their outlay on resale — net spend is lower.`:`No costed supplies selected yet.`;
 }
 
 // ---- stat updating ----
@@ -447,11 +496,51 @@ document.addEventListener("change",e=>{
   const t=e.target;
   if(t.classList.contains("method")){ SKILLS[+t.dataset.si].sel=+t.value; renderSkills(); refresh(); }
   else if(t.dataset.lvl!==undefined){
+    const sk=SKILLS[+t.dataset.lvl];
     const lv=Math.max(1,Math.min(99,parseInt(t.value)||1));
-    SKILLS[+t.dataset.lvl].cur=xpForLevel(lv);
-    renderSkills(); refresh();
+    // Only overwrite XP if the level actually changed — otherwise keep the exact fetched XP.
+    if(lv!==levelFromXp(sk.cur)){ sk.cur=xpForLevel(lv); renderSkills(); refresh(); }
+    else if(String(lv)!==t.value){ t.value=lv; }
   }
 });
+
+// ---- live GE prices + copy list ----
+function setPriceStatus(msg,cls){ const s=document.getElementById("price-status"); s.textContent=msg; s.className="status "+(cls||"info"); }
+async function fetchGEPrices(){
+  setPriceStatus("Fetching live GE prices from the OSRS Wiki…","info");
+  try{
+    const res=await fetch("https://prices.runescape.wiki/api/v1/osrs/latest");
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const {data}=await res.json();
+    let n=0; const missing=[];
+    Object.entries(ITEM_IDS).forEach(([name,id])=>{
+      const p=data[id], v=p&&(typeof p.high==="number"?p.high:p.low);
+      if(typeof v==="number"){ PRICES[name]=v; n++; } else missing.push(name);
+    });
+    renderShop(compute().itemTotals); refresh();
+    setPriceStatus(n?`Updated ${n} live prices from the wiki${missing.length?` (${missing.length} unmatched — kept placeholders)`:""}.`:"No prices matched — kept placeholders.", n?"ok":"err");
+  }catch(e){
+    setPriceStatus("Live price fetch failed ("+e.message+"). Inside the Claude app the sandbox blocks this; on GitHub Pages it works.","err");
+  }
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(_){ setPriceStatus("Couldn't copy automatically.","err"); }
+  document.body.removeChild(ta);
+}
+function copyList(){
+  const {itemTotals}=compute();
+  const rows=Object.keys(itemTotals).filter(n=>itemTotals[n]>0)
+    .sort((a,b)=>(itemTotals[b]*(PRICES[b]||0))-(itemTotals[a]*(PRICES[a]||0)));
+  if(!rows.length){ setPriceStatus("Nothing to copy — no costed supplies selected.","err"); return; }
+  const text=rows.map(n=>`${fmt(itemTotals[n])} x ${n}`).join("\n");
+  const done=()=>setPriceStatus(`Copied ${rows.length} items to clipboard.`,"ok");
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  else fallbackCopy(text,done);
+}
+document.getElementById("btn-prices").addEventListener("click",fetchGEPrices);
+document.getElementById("btn-copy").addEventListener("click",copyList);
 
 renderSkills(); renderGather(); renderShop(compute().itemTotals); refresh();
 </script>
