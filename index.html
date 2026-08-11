@@ -48,6 +48,8 @@
   .coins{color:var(--gold-bright)}
   .note{font-size:12.5px;color:var(--muted);margin:12px 2px 0}
   .note b{color:var(--parch);font-weight:600}
+  .shop-tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 2px 12px}
+  .shop-tools .status{margin-top:0}
 
   section{margin-top:30px}
   .sec-title{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 2px 12px;display:flex;align-items:center;gap:10px}
@@ -149,12 +151,17 @@
 
   <section>
     <h2 class="sec-title">Consolidated shopping list</h2>
+    <div class="shop-tools">
+      <button class="act" id="btn-prices">Fetch live GE prices</button>
+      <button class="act ghost" id="btn-copy">Copy list</button>
+      <span class="status info" id="price-status"></span>
+    </div>
     <table class="shop">
       <thead><tr><th>Item</th><th class="num">Total qty</th><th class="num">Unit price (gp)</th><th class="num">Subtotal</th></tr></thead>
       <tbody id="shop-body"></tbody>
       <tfoot><tr><td>Grand total</td><td class="num qty" id="foot-qty"></td><td class="num"></td><td class="num" id="foot-cost"></td></tr></tfoot>
     </table>
-    <p class="note">Quantities use OSRS stack colours: <span style="color:var(--stack-yellow)">yellow</span> &lt;100k · <span style="color:var(--stack-white)">white</span> 100k–10m · <span style="color:var(--stack-green)">green</span> 10m+. Edit a unit price once here and it applies everywhere.</p>
+    <p class="note">Sorted by subtotal. Quantities use OSRS stack colours: <span style="color:var(--stack-yellow)">yellow</span> &lt;100k · <span style="color:var(--stack-white)">white</span> 100k–10m · <span style="color:var(--stack-green)">green</span> 10m+. Edit a unit price once here and it applies everywhere, or pull live GE prices above.</p>
   </section>
 
   <section>
@@ -203,6 +210,25 @@ const PRICES={
   "Kwuarm":900,"Limpwurt root":150,"Cadantine":1400,"White berries":400,"Dwarf weed":700,"Wine of zamorak":2000,
   "Redwood logs":350,
   "Raw summer pie":250,"Mithril dart tip":8,"Molten glass":90,"Adamant bar":1400,"Lantadyme":1500,"Potato cactus":400
+};
+
+// OSRS item IDs for live GE price lookups via the wiki prices API.
+const ITEM_IDS={
+  "Raw karambwan":3142,"Grapes":1987,"Jug of water":1937,"Raw shark":383,
+  "Yew logs":1515,"Magic logs":1513,"Maple logs":1517,"Willow logs":1519,"Bow string":1777,
+  "Adamant dart tip":821,"Rune dart tip":822,"Feather":314,
+  "Green dragon leather":1745,"Blue dragon leather":2505,"Red dragon leather":2507,"Black dragon leather":2509,
+  "Battlestaff":1391,"Air orb":573,
+  "Gold ore":444,"Iron ore":440,"Coal":453,"Runite ore":451,"Steel bar":2353,
+  "Ranarr weed":257,"Snape grass":231,"Snapdragon":3000,"Red spiders' eggs":223,
+  "Toadflax":2998,"Crushed nest":6693,"Super attack(4)":2436,"Super strength(4)":2440,"Super defence(4)":2442,"Torstol":269,
+  "Oak plank":8778,"Mahogany plank":8782,
+  "Raw lobster":377,"Raw swordfish":371,"Raw monkfish":7944,"Raw anglerfish":13439,
+  "Dragon dart tip":11232,"Uncut diamond":1617,"Uncut dragonstone":1631,
+  "Mithril ore":447,"Adamantite ore":449,
+  "Kwuarm":263,"Limpwurt root":225,"Cadantine":265,"White berries":239,"Dwarf weed":267,"Wine of zamorak":245,
+  "Redwood logs":19669,
+  "Raw summer pie":7176,"Mithril dart tip":823,"Molten glass":1775,"Adamant bar":2361,"Lantadyme":2481,"Potato cactus":3138
 };
 
 const SKILLS=[
@@ -308,7 +334,7 @@ function compute(){
 
 function renderSkills(){
   document.getElementById("skills").innerHTML=SKILLS.map((sk,si)=>{
-    const lvl=levelFromXp(sk.cur),rem=XP99-sk.cur,m=sel(sk);
+    const lvl=levelFromXp(sk.cur),rem=Math.max(0,XP99-sk.cur),m=sel(sk);
     const firstFrom=Math.min(...m.legs.map(l=>l.from));
     const gap=firstFrom>lvl?`<span class="gap-flag">↳ lvl ${lvl}→${firstFrom} not costed</span>`:"";
     const opts=sk.methods.map((mm,i)=>`<option value="${i}" ${i===sk.sel?"selected":""}>${mm.name}</option>`).join("");
@@ -329,7 +355,7 @@ function renderSkills(){
         <div class="skill-head">
           <span class="skill-name">${sk.name}</span>
           <span class="lvl-wrap">lvl <input class="lvl-in" type="number" min="1" max="99" data-lvl="${si}" value="${lvl}"> → 99</span>
-          <span class="xp-rem">${fmt(rem)} xp to go</span>
+          <span class="xp-rem">${rem>0?fmt(rem)+" xp to go":"99 — done"}</span>
           <span class="skill-sub" data-out="sub-${si}"></span>
         </div>
         <div class="method-bar"><label>Method</label><select class="method" data-si="${si}">${opts}</select>${gap}</div>
@@ -339,7 +365,7 @@ function renderSkills(){
 
 let SHOP_ITEMS=[];
 function renderShop(itemTotals){
-  SHOP_ITEMS=Object.keys(itemTotals);
+  SHOP_ITEMS=Object.keys(itemTotals).sort((a,b)=>(itemTotals[b]*(PRICES[b]||0))-(itemTotals[a]*(PRICES[a]||0)));
   document.getElementById("shop-body").innerHTML=SHOP_ITEMS.map(name=>`
     <tr><td class="itemname">${name}</td><td class="num qty" data-out="shopqty-${name}"></td>
       <td class="num"><input class="price-in" type="number" min="0" step="1" data-price="${name}" value="${PRICES[name]||0}"></td>
@@ -347,12 +373,12 @@ function renderShop(itemTotals){
 }
 function renderGather(){
   document.getElementById("gather").innerHTML=GATHER.map(g=>{
-    const lvl=levelFromXp(g.cur);
-    return `<div class="mini-card"><div class="nm">${g.name}</div><div class="rw">${lvl} → 99 · ${fmt(XP99-g.cur)} xp</div><div class="mini-note">Gathered, not bought — no shopping list.</div></div>`;
+    const lvl=levelFromXp(g.cur),rem=Math.max(0,XP99-g.cur);
+    return `<div class="mini-card"><div class="nm">${g.name}</div><div class="rw">${lvl} → 99 · ${rem>0?fmt(rem)+" xp":"done"}</div><div class="mini-note">Gathered, not bought — no shopping list.</div></div>`;
   }).join("");
   document.getElementById("special").innerHTML=SPECIAL.map(s=>{
-    const lvl=levelFromXp(s.cur),cls=s.kind==="blocked"?"blocked":"special",tag=s.kind==="blocked"?"blocked":"planning note";
-    return `<div class="mini-card ${cls}"><div class="tag">${tag}</div><div class="nm">${s.name}</div><div class="rw">${lvl} → 99 · ${fmt(XP99-s.cur)} xp</div><div class="mini-note">${s.note}</div></div>`;
+    const lvl=levelFromXp(s.cur),rem=Math.max(0,XP99-s.cur),cls=s.kind==="blocked"?"blocked":"special",tag=s.kind==="blocked"?"blocked":"planning note";
+    return `<div class="mini-card ${cls}"><div class="tag">${tag}</div><div class="nm">${s.name}</div><div class="rw">${lvl} → 99 · ${rem>0?fmt(rem)+" xp":"done"}</div><div class="mini-note">${s.note}</div></div>`;
   }).join("");
 }
 
@@ -470,11 +496,51 @@ document.addEventListener("change",e=>{
   const t=e.target;
   if(t.classList.contains("method")){ SKILLS[+t.dataset.si].sel=+t.value; renderSkills(); refresh(); }
   else if(t.dataset.lvl!==undefined){
+    const sk=SKILLS[+t.dataset.lvl];
     const lv=Math.max(1,Math.min(99,parseInt(t.value)||1));
-    SKILLS[+t.dataset.lvl].cur=xpForLevel(lv);
-    renderSkills(); refresh();
+    // Only overwrite XP if the level actually changed — otherwise keep the exact fetched XP.
+    if(lv!==levelFromXp(sk.cur)){ sk.cur=xpForLevel(lv); renderSkills(); refresh(); }
+    else if(String(lv)!==t.value){ t.value=lv; }
   }
 });
+
+// ---- live GE prices + copy list ----
+function setPriceStatus(msg,cls){ const s=document.getElementById("price-status"); s.textContent=msg; s.className="status "+(cls||"info"); }
+async function fetchGEPrices(){
+  setPriceStatus("Fetching live GE prices from the OSRS Wiki…","info");
+  try{
+    const res=await fetch("https://prices.runescape.wiki/api/v1/osrs/latest");
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const {data}=await res.json();
+    let n=0; const missing=[];
+    Object.entries(ITEM_IDS).forEach(([name,id])=>{
+      const p=data[id], v=p&&(typeof p.high==="number"?p.high:p.low);
+      if(typeof v==="number"){ PRICES[name]=v; n++; } else missing.push(name);
+    });
+    renderShop(compute().itemTotals); refresh();
+    setPriceStatus(n?`Updated ${n} live prices from the wiki${missing.length?` (${missing.length} unmatched — kept placeholders)`:""}.`:"No prices matched — kept placeholders.", n?"ok":"err");
+  }catch(e){
+    setPriceStatus("Live price fetch failed ("+e.message+"). Inside the Claude app the sandbox blocks this; on GitHub Pages it works.","err");
+  }
+}
+function fallbackCopy(text,done){
+  const ta=document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; ta.style.opacity="0";
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(_){ setPriceStatus("Couldn't copy automatically.","err"); }
+  document.body.removeChild(ta);
+}
+function copyList(){
+  const {itemTotals}=compute();
+  const rows=Object.keys(itemTotals).filter(n=>itemTotals[n]>0)
+    .sort((a,b)=>(itemTotals[b]*(PRICES[b]||0))-(itemTotals[a]*(PRICES[a]||0)));
+  if(!rows.length){ setPriceStatus("Nothing to copy — no costed supplies selected.","err"); return; }
+  const text=rows.map(n=>`${fmt(itemTotals[n])} x ${n}`).join("\n");
+  const done=()=>setPriceStatus(`Copied ${rows.length} items to clipboard.`,"ok");
+  if(navigator.clipboard&&navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  else fallbackCopy(text,done);
+}
+document.getElementById("btn-prices").addEventListener("click",fetchGEPrices);
+document.getElementById("btn-copy").addEventListener("click",copyList);
 
 renderSkills(); renderGather(); renderShop(compute().itemTotals); refresh();
 </script>
