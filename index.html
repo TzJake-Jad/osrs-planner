@@ -146,7 +146,6 @@
     <div><div class="lbl">Total supply cost</div><div class="big" id="grand-compact">—</div></div>
     <div style="align-self:flex-end"><div class="exact" id="grand-exact"></div></div>
   </div>
-  <p class="note" id="head-note"></p>
 
   <section>
     <h2 class="sec-title">Consolidated shopping list</h2>
@@ -361,8 +360,6 @@ function refresh(){
   });
   document.getElementById("foot-qty").textContent=fmt(fq);
   document.getElementById("foot-cost").textContent=fmt(fc);
-  const rank=Object.entries(itemTotals).map(([n,q])=>[n,q*(PRICES[n]||0)]).sort((a,b)=>b[1]-a[1]).slice(0,3).filter(x=>x[1]>0).map(([n,c])=>`${n} (${gpCompact(c)})`);
-  document.getElementById("head-note").innerHTML=rank.length?`Biggest cost drivers now: <b>${rank.join(" · ")}</b>. Herblore &amp; Smithing recoup most of their outlay on resale — net spend is lower.`:`No costed supplies selected yet.`;
 }
 
 // ---- stat updating ----
