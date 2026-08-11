@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skilling Supply Planner — 24 Weetbix</title>
+<style>
+  :root{
+    --stone:#14130f;--stone-2:#1c1a15;--panel:#242019;--panel-2:#2c2820;
+    --line:#3a3327;--gold:#c8992a;--gold-bright:#e6b93c;--parch:#e9e2cf;
+    --muted:#9b937f;--dim:#6f6857;--green:#7fb069;--red:#c6553f;
+    --stack-yellow:#f2e07e;--stack-white:#f3efe2;--stack-green:#83d06b;
+    --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:radial-gradient(1200px 500px at 50% -200px,#221f18 0%,var(--stone) 60%) fixed;color:var(--parch);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:15px;line-height:1.5;padding:28px 18px 80px}
+  .wrap{max-width:1000px;margin:0 auto}
+  header{margin-bottom:20px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin:0 0 8px}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:clamp(26px,5vw,40px);margin:0;color:var(--parch);text-shadow:0 1px 0 #000}
+  h1 .acct{color:var(--gold-bright)}
+  .sub{color:var(--muted);margin:8px 0 0;font-size:14px;max-width:72ch}
+  .sub b{color:var(--parch)}
+
+  .stats-panel{margin-top:18px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
+  .stats-grid{display:grid;grid-template-columns:1fr;gap:14px}
+  @media(min-width:720px){.stats-grid{grid-template-columns:1.4fr 1fr}}
+  .sp-block label{display:block;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  textarea.json-in{width:100%;height:74px;resize:vertical;background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:var(--mono);font-size:12px;padding:9px 10px;border-radius:6px}
+  textarea.json-in:focus,input.rsn-in:focus{outline:none;border-color:var(--gold)}
+  input.rsn-in{width:100%;background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:system-ui,sans-serif;font-size:14px;padding:8px 10px;border-radius:6px}
+  .btn-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  button.act{background:linear-gradient(180deg,#3a3324,#2b2619);border:1px solid var(--gold);color:var(--gold-bright);font-family:system-ui,sans-serif;font-size:13px;font-weight:600;padding:8px 14px;border-radius:6px;cursor:pointer}
+  button.act:hover{background:linear-gradient(180deg,#463d29,#332d1e)}
+  button.act:active{transform:translateY(1px)}
+  button.ghost{border-color:var(--line);color:var(--muted);background:var(--stone-2)}
+  .status{margin-top:10px;font-family:var(--mono);font-size:12px;min-height:16px}
+  .status.ok{color:var(--green)}
+  .status.err{color:var(--red)}
+  .status.info{color:var(--muted)}
+  .sp-note{font-size:11.5px;color:var(--dim);margin-top:10px;line-height:1.5}
+
+  .total-card{margin-top:22px;background:linear-gradient(180deg,var(--panel-2),var(--panel));border:1px solid var(--gold);border-radius:10px;padding:20px 22px;display:flex;flex-wrap:wrap;gap:6px 26px;align-items:baseline;box-shadow:inset 0 0 0 1px #000,0 6px 24px rgba(0,0,0,.35)}
+  .total-card .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  .total-card .big{font-family:var(--mono);font-weight:700;font-size:clamp(30px,6vw,46px);color:var(--gold-bright);line-height:1}
+  .total-card .exact{font-family:var(--mono);font-size:13px;color:var(--dim)}
+  .coins{color:var(--gold-bright)}
+  .note{font-size:12.5px;color:var(--muted);margin:12px 2px 0}
+  .note b{color:var(--parch);font-weight:600}
+
+  section{margin-top:30px}
+  .sec-title{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 2px 12px;display:flex;align-items:center;gap:10px}
+  .sec-title::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  table{width:100%;border-collapse:collapse}
+  .shop{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .shop th,.shop td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line)}
+  .shop th{font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;background:var(--stone-2)}
+  .shop tr:last-child td{border-bottom:none}
+  .shop td.num,.shop th.num{text-align:right;font-family:var(--mono)}
+  .qty{font-family:var(--mono);font-weight:700}
+  .itemname{font-weight:600}
+  .price-in{width:96px;background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:var(--mono);font-size:13px;text-align:right;padding:5px 8px;border-radius:5px}
+  .price-in:focus{outline:none;border-color:var(--gold)}
+  .shop tfoot td{background:var(--stone-2);font-weight:700}
+  .shop tfoot .qty,.shop tfoot .num{color:var(--gold-bright)}
+
+  .skill{background:var(--panel);border:1px solid var(--line);border-radius:10px;margin-bottom:14px;overflow:hidden}
+  .skill-head{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 16px;background:var(--stone-2);border-bottom:1px solid var(--line)}
+  .skill-name{font-family:Georgia,serif;font-size:18px;font-weight:700;color:var(--parch)}
+  .lvl-wrap{font-family:var(--mono);font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+  .lvl-in{width:46px;background:var(--stone);border:1px solid var(--line);color:var(--gold-bright);font-family:var(--mono);font-size:13px;text-align:center;padding:3px 4px;border-radius:5px}
+  .lvl-in:focus{outline:none;border-color:var(--gold)}
+  .xp-rem{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .skill-sub{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--gold-bright);font-weight:700}
+  .method-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+  .method-bar label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  select.method{background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:system-ui,sans-serif;font-size:14px;padding:6px 10px;border-radius:6px;min-width:230px;cursor:pointer}
+  select.method:focus{outline:none;border-color:var(--gold)}
+  .gap-flag{font-family:var(--mono);font-size:11.5px;color:var(--red)}
+
+  .leg{padding:12px 16px;border-bottom:1px solid var(--line)}
+  .leg:last-child{border-bottom:none}
+  .leg-top{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:baseline;margin-bottom:8px}
+  .leg-range{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .leg-actions{font-family:var(--mono);font-size:12px;color:var(--dim);margin-left:auto}
+  .xpper{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .num-in{width:70px;background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:var(--mono);font-size:12px;text-align:right;padding:3px 6px;border-radius:5px}
+  .num-in.sm{width:50px}
+  .num-in:focus{outline:none;border-color:var(--gold)}
+  .items{display:flex;flex-direction:column;gap:5px;font-size:13.5px}
+  .item-row{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:4px 0 4px 14px;border-left:2px solid var(--line)}
+  .item-row .nm{min-width:150px;color:var(--parch)}
+  .item-row .per{font-family:var(--mono);font-size:12px;color:var(--dim)}
+  .item-row .tot{font-family:var(--mono);margin-left:auto;font-weight:700}
+  .item-row .cost{font-family:var(--mono);font-size:12px;color:var(--muted);min-width:96px;text-align:right}
+  .free{font-family:var(--mono);color:var(--green);font-size:13px}
+
+  .mini{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+  .mini-card{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px 14px}
+  .mini-card .nm{font-family:Georgia,serif;font-size:16px;font-weight:700}
+  .mini-card .rw{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:3px}
+  .mini-card.blocked{border-color:#4a3128}
+  .mini-card.blocked .nm{color:var(--red)}
+  .mini-card.special{border-color:#3c3a24}
+  .mini-card .tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .mini-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45}
+
+  footer{margin-top:34px;font-size:12.5px;color:var(--dim);line-height:1.6}
+  footer b{color:var(--muted)}
+  a{color:var(--gold-bright)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">OSRS · Full-path skilling planner</p>
+    <h1>Supplies to 99 — <span class="acct" id="acct-name">24 Weetbix</span></h1>
+    <p class="sub">Chained from current XP to level 99 across every non-combat skill. <b>Refresh stats any time</b> below, <b>pick a method</b> per skill, and edit any rate or GE price — everything recomputes live.</p>
+
+    <div class="stats-panel">
+      <div class="stats-grid">
+        <div class="sp-block">
+          <label>Paste TempleOSRS or Wise Old Man JSON — works everywhere</label>
+          <textarea class="json-in" id="json-in" placeholder='Open templeosrs.com/api/player_stats.php?player=24%20Weetbix and paste the whole {"data":{...}} response here'></textarea>
+          <div class="btn-row">
+            <button class="act" id="btn-json">Update from JSON</button>
+            <button class="act ghost" id="btn-reset">Reset to loaded stats</button>
+          </div>
+        </div>
+        <div class="sp-block">
+          <label>Or fetch live by RSN — best-effort</label>
+          <input class="rsn-in" id="rsn-in" value="24 Weetbix" spellcheck="false">
+          <div class="btn-row">
+            <button class="act" id="btn-wom">Fetch live (Wise Old Man)</button>
+          </div>
+          <div class="sp-note">Live fetch hits the Wise Old Man API directly from your browser. It works when you open this file locally or self-host it; inside the Claude app it may be blocked by the sandbox — if so, use paste. Shows WOM's last tracked snapshot, so update the account on WOM first for fresh numbers.</div>
+        </div>
+      </div>
+      <div class="status info" id="status">Loaded: 24 Weetbix snapshot from 2026-08-11. You can also edit any skill's current level inline below.</div>
+    </div>
+  </header>
+
+  <div class="total-card">
+    <div><div class="lbl">Total supply cost</div><div class="big" id="grand-compact">—</div></div>
+    <div style="align-self:flex-end"><div class="exact" id="grand-exact"></div></div>
+  </div>
+  <p class="note" id="head-note"></p>
+
+  <section>
+    <h2 class="sec-title">Consolidated shopping list</h2>
+    <table class="shop">
+      <thead><tr><th>Item</th><th class="num">Total qty</th><th class="num">Unit price (gp)</th><th class="num">Subtotal</th></tr></thead>
+      <tbody id="shop-body"></tbody>
+      <tfoot><tr><td>Grand total</td><td class="num qty" id="foot-qty"></td><td class="num"></td><td class="num" id="foot-cost"></td></tr></tfoot>
+    </table>
+    <p class="note">Quantities use OSRS stack colours: <span style="color:var(--stack-yellow)">yellow</span> &lt;100k · <span style="color:var(--stack-white)">white</span> 100k–10m · <span style="color:var(--stack-green)">green</span> 10m+. Edit a unit price once here and it applies everywhere.</p>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Supply skills — choose your method</h2>
+    <div id="skills"></div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">No buyable supplies — time only</h2>
+    <div class="mini" id="gather"></div>
+  </section>
+
+  <section>
+    <h2 class="sec-title">Special cases</h2>
+    <div class="mini" id="special"></div>
+  </section>
+
+  <footer>
+    <p><b>Assumptions:</b> main account, buying off the GE. Prices are placeholders — update them to live GE prices before trusting the gp figure.</p>
+    <p><b>Level gaps:</b> if a method unlocks above your current level, the levels below it show as “not costed” — switch to a lower-tier method to include them. Editing a level inline snaps to that level's base XP; paste JSON for exact XP.</p>
+    <p><b>Sells back:</b> Smithing bars and Herblore potions recover much of their raw cost on resale. Firemaking defaults to Wintertodt (free); Construction has a cheaper Mahogany Homes route not modelled here.</p>
+    <p><b>Excluded — combat skills (per your goal):</b> Attack, Strength, Defence, Hitpoints, Ranged, Magic, Prayer.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+function xpForLevel(level){ if(level<=1) return 0; let t=0; for(let x=1;x<level;x++){ t+=Math.floor(x+300*Math.pow(2,x/7)); } return Math.floor(t/4); }
+const XP99=xpForLevel(99);
+
+const PRICES={
+  "Raw karambwan":500,"Grapes":30,"Jug of water":20,"Raw shark":700,
+  "Yew logs":250,"Magic logs":1000,"Maple logs":40,"Willow logs":20,"Bow string":120,
+  "Adamant dart tip":25,"Rune dart tip":30,"Feather":3,
+  "Green dragon leather":1600,"Blue dragon leather":1800,"Red dragon leather":2400,"Black dragon leather":6500,
+  "Battlestaff":8000,"Air orb":1200,
+  "Gold ore":180,"Iron ore":120,"Coal":150,"Runite ore":11000,"Steel bar":480,
+  "Ranarr weed":7500,"Snape grass":250,"Snapdragon":9000,"Red spiders' eggs":900,
+  "Toadflax":3000,"Crushed nest":3500,"Super attack(4)":1000,"Super strength(4)":1200,"Super defence(4)":1100,"Torstol":6000,
+  "Oak plank":450,"Mahogany plank":1900
+};
+
+const SKILLS=[
+  {name:"Cooking",cur:2753655,sel:0,methods:[
+    {name:"Raw karambwan (190xp)",req:30,legs:[{from:30,to:99,xpPer:190,items:[{name:"Raw karambwan",per:1}]}]},
+    {name:"Jugs of wine (200xp)",req:35,legs:[{from:35,to:99,xpPer:200,items:[{name:"Grapes",per:1},{name:"Jug of water",per:1}]}]},
+    {name:"Cook sharks (210xp)",req:80,legs:[{from:80,to:99,xpPer:210,items:[{name:"Raw shark",per:1}]}]}
+  ]},
+  {name:"Fletching",cur:408813,sel:0,methods:[
+    {name:"Yew longbows (135xp)",req:70,legs:[{from:70,to:99,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]}]},
+    {name:"Magic longbows (183xp)",req:85,legs:[{from:85,to:99,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]}]},
+    {name:"Adamant darts (15xp)",req:61,legs:[{from:61,to:99,xpPer:15,items:[{name:"Adamant dart tip",per:1},{name:"Feather",per:1}]}]},
+    {name:"Rune darts (18.8xp)",req:81,legs:[{from:81,to:99,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]}]}
+  ]},
+  {name:"Crafting",cur:3002,sel:0,methods:[
+    {name:"Green d'hide bodies (148xp)",req:63,legs:[{from:63,to:99,xpPer:148,items:[{name:"Green dragon leather",per:3}]}]},
+    {name:"Blue d'hide bodies (210xp)",req:66,legs:[{from:66,to:99,xpPer:210,items:[{name:"Blue dragon leather",per:3}]}]},
+    {name:"Red d'hide bodies (258xp)",req:73,legs:[{from:73,to:99,xpPer:258,items:[{name:"Red dragon leather",per:3}]}]},
+    {name:"Black d'hide bodies (306xp)",req:79,legs:[{from:79,to:99,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]},
+    {name:"Air battlestaves (137.5xp)",req:66,legs:[{from:66,to:99,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]}]}
+  ]},
+  {name:"Smithing",cur:12743,sel:0,methods:[
+    {name:"Gold bars — BF (56.2xp)",req:40,legs:[{from:40,to:99,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
+    {name:"Steel bars — BF (17.5xp)",req:30,legs:[{from:30,to:99,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]}]},
+    {name:"Rune bars — BF (50xp)",req:85,legs:[{from:85,to:99,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]},
+    {name:"Cannonballs (25.6xp)",req:35,legs:[{from:35,to:99,xpPer:25.6,items:[{name:"Steel bar",per:1}]}]}
+  ]},
+  {name:"Herblore",cur:4045,sel:0,methods:[
+    {name:"Prayer potions (142.5xp)",req:38,legs:[{from:38,to:99,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]}]},
+    {name:"Super restores (142.5xp)",req:63,legs:[{from:63,to:99,xpPer:142.5,items:[{name:"Snapdragon",per:1},{name:"Red spiders' eggs",per:1}]}]},
+    {name:"Saradomin brews (180xp)",req:81,legs:[{from:81,to:99,xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]}]},
+    {name:"Super combat (150xp)",req:90,legs:[{from:90,to:99,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]}
+  ]},
+  {name:"Construction",cur:939,sel:0,methods:[
+    {name:"Oak larders → Mahogany tables",req:33,legs:[
+      {from:33,to:52,xpPer:480,items:[{name:"Oak plank",per:8}]},
+      {from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]},
+    {name:"Oak larders only (cheapest)",req:33,legs:[{from:33,to:99,xpPer:480,items:[{name:"Oak plank",per:8}]}]},
+    {name:"Mahogany tables (from 52)",req:52,legs:[{from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]}
+  ]},
+  {name:"Firemaking",cur:101470,sel:0,methods:[
+    {name:"Wintertodt (free)",req:50,legs:[{from:50,to:99,xpPer:0,items:[]}]},
+    {name:"Burn magic logs (303.8xp)",req:50,legs:[{from:50,to:99,xpPer:303.8,items:[{name:"Magic logs",per:1}]}]},
+    {name:"Burn yew logs (202.5xp)",req:50,legs:[{from:50,to:99,xpPer:202.5,items:[{name:"Yew logs",per:1}]}]},
+    {name:"Burn maple logs (135xp)",req:50,legs:[{from:50,to:99,xpPer:135,items:[{name:"Maple logs",per:1}]}]},
+    {name:"Burn willow logs (90xp)",req:50,legs:[{from:50,to:99,xpPer:90,items:[{name:"Willow logs",per:1}]}]}
+  ]}
+];
+const GATHER=[
+  {name:"Woodcutting",cur:85},{name:"Fishing",cur:18294},{name:"Mining",cur:18813},
+  {name:"Agility",cur:17575},{name:"Thieving",cur:7958},{name:"Runecraft",cur:0},{name:"Hunter",cur:1000}
+];
+const SPECIAL=[
+  {name:"Farming",cur:0,kind:"special",note:"Run-based over many days (tree + herb runs), not a bulk grind. Ballpark: a few hundred tree/fruit-tree seeds + several thousand herb seeds. Plan by runs, not one order."},
+  {name:"Slayer",cur:1180,kind:"blocked",note:"Requires combat. This build is 1 Attack / 1 Strength / 1 Ranged / 1 Magic — Slayer to 99 isn't feasible without training a combat style first."}
+];
+const NAMES=[...SKILLS,...GATHER,...SPECIAL].map(s=>s.name);
+// snapshot of initially-loaded stats for the reset button
+const LOADED=Object.fromEntries([...SKILLS,...GATHER,...SPECIAL].map(s=>[s.name,s.cur]));
+
+const sel=sk=>sk.methods[sk.sel];
+function levelFromXp(xp){ for(let l=99;l>=1;l--){ if(xp>=xpForLevel(l)) return l; } return 1; }
+function stackColor(n){ return n>=1e7?"var(--stack-green)":n>=1e5?"var(--stack-white)":"var(--stack-yellow)"; }
+function gpCompact(n){ const s=n<0?"-":""; n=Math.abs(n);
+  if(n>=1e9) return s+(n/1e9).toFixed(2).replace(/\.?0+$/,"")+"B";
+  if(n>=1e6) return s+(n/1e6).toFixed(1).replace(/\.0$/,"")+"M";
+  if(n>=1e3) return s+(n/1e3).toFixed(1).replace(/\.0$/,"")+"K";
+  return s+n.toString(); }
+const fmt=n=>Math.round(n).toLocaleString("en-US");
+
+function legXp(sk,leg){ const f=Math.max(xpForLevel(leg.from),sk.cur); return Math.max(0,xpForLevel(leg.to)-f); }
+function compute(){
+  const itemTotals={}; let grand=0;
+  SKILLS.forEach(sk=>{ sk._sub=0;
+    sel(sk).legs.forEach(leg=>{
+      const xp=legXp(sk,leg);
+      leg._actions=leg.xpPer>0?Math.ceil(xp/leg.xpPer):0;
+      leg._items=leg.items.map(it=>{ const qty=leg._actions*it.per; const cost=qty*(PRICES[it.name]||0);
+        itemTotals[it.name]=(itemTotals[it.name]||0)+qty; sk._sub+=cost; grand+=cost; return {name:it.name,qty,cost}; });
+    });
+  });
+  return {itemTotals,grand};
+}
+
+function renderSkills(){
+  document.getElementById("skills").innerHTML=SKILLS.map((sk,si)=>{
+    const lvl=levelFromXp(sk.cur),rem=XP99-sk.cur,m=sel(sk);
+    const firstFrom=Math.min(...m.legs.map(l=>l.from));
+    const gap=firstFrom>lvl?`<span class="gap-flag">↳ lvl ${lvl}→${firstFrom} not costed</span>`:"";
+    const opts=sk.methods.map((mm,i)=>`<option value="${i}" ${i===sk.sel?"selected":""}>${mm.name}</option>`).join("");
+    const legs=m.legs.map((leg,li)=>{
+      const hasItems=leg.items.length>0;
+      const items=leg.items.map((it,ii)=>`
+        <div class="item-row"><span class="nm">${it.name}</span>
+          <span class="per">× <input class="num-in sm" type="number" min="0" step="0.1" data-si="${si}" data-li="${li}" data-ii="${ii}" data-f="per" value="${it.per}"> / action</span>
+          <span class="tot" data-out="qty-${si}-${li}-${ii}"></span>
+          <span class="cost" data-out="cost-${si}-${li}-${ii}"></span></div>`).join("");
+      return `<div class="leg"><div class="leg-top">
+          <span class="leg-range">lvl ${leg.from}→${leg.to}</span>
+          ${hasItems?`<span class="xpper">xp/action <input class="num-in" type="number" min="0.1" step="0.1" data-si="${si}" data-li="${li}" data-f="xpPer" value="${leg.xpPer}"></span>`:`<span class="free">Wintertodt — no supplies to buy</span>`}
+          ${hasItems?`<span class="leg-actions" data-out="act-${si}-${li}"></span>`:""}
+        </div>${hasItems?`<div class="items">${items}</div>`:""}</div>`;
+    }).join("");
+    return `<div class="skill">
+        <div class="skill-head">
+          <span class="skill-name">${sk.name}</span>
+          <span class="lvl-wrap">lvl <input class="lvl-in" type="number" min="1" max="99" data-lvl="${si}" value="${lvl}"> → 99</span>
+          <span class="xp-rem">${fmt(rem)} xp to go</span>
+          <span class="skill-sub" data-out="sub-${si}"></span>
+        </div>
+        <div class="method-bar"><label>Method</label><select class="method" data-si="${si}">${opts}</select>${gap}</div>
+        ${legs}</div>`;
+  }).join("");
+}
+
+let SHOP_ITEMS=[];
+function renderShop(itemTotals){
+  SHOP_ITEMS=Object.keys(itemTotals);
+  document.getElementById("shop-body").innerHTML=SHOP_ITEMS.map(name=>`
+    <tr><td class="itemname">${name}</td><td class="num qty" data-out="shopqty-${name}"></td>
+      <td class="num"><input class="price-in" type="number" min="0" step="1" data-price="${name}" value="${PRICES[name]||0}"></td>
+      <td class="num" data-out="shopcost-${name}"></td></tr>`).join("");
+}
+function renderGather(){
+  document.getElementById("gather").innerHTML=GATHER.map(g=>{
+    const lvl=levelFromXp(g.cur);
+    return `<div class="mini-card"><div class="nm">${g.name}</div><div class="rw">${lvl} → 99 · ${fmt(XP99-g.cur)} xp</div><div class="mini-note">Gathered, not bought — no shopping list.</div></div>`;
+  }).join("");
+  document.getElementById("special").innerHTML=SPECIAL.map(s=>{
+    const lvl=levelFromXp(s.cur),cls=s.kind==="blocked"?"blocked":"special",tag=s.kind==="blocked"?"blocked":"planning note";
+    return `<div class="mini-card ${cls}"><div class="tag">${tag}</div><div class="nm">${s.name}</div><div class="rw">${lvl} → 99 · ${fmt(XP99-s.cur)} xp</div><div class="mini-note">${s.note}</div></div>`;
+  }).join("");
+}
+
+function refresh(){
+  const {itemTotals,grand}=compute();
+  document.getElementById("grand-compact").textContent=gpCompact(grand)+" gp";
+  document.getElementById("grand-exact").innerHTML=`<span class="coins">${fmt(grand)}</span> gp exact`;
+  SKILLS.forEach((sk,si)=>{
+    const subEl=document.querySelector(`[data-out="sub-${si}"]`);
+    if(subEl) subEl.textContent=sk._sub>0?gpCompact(sk._sub)+" gp":"free";
+    sel(sk).legs.forEach((leg,li)=>{
+      const actEl=document.querySelector(`[data-out="act-${si}-${li}"]`);
+      if(actEl) actEl.textContent=fmt(leg._actions)+" actions";
+      leg._items.forEach((it,ii)=>{
+        const q=document.querySelector(`[data-out="qty-${si}-${li}-${ii}"]`);
+        const c=document.querySelector(`[data-out="cost-${si}-${li}-${ii}"]`);
+        if(q){ q.textContent=fmt(it.qty); q.style.color=stackColor(it.qty); }
+        if(c) c.textContent=it.cost>0?gpCompact(it.cost)+" gp":"";
+      });
+    });
+  });
+  const keys=Object.keys(itemTotals);
+  if(keys.length!==SHOP_ITEMS.length||keys.some(k=>!SHOP_ITEMS.includes(k))) renderShop(itemTotals);
+  let fq=0,fc=0;
+  SHOP_ITEMS.forEach(name=>{
+    const qty=itemTotals[name]||0,cost=qty*(PRICES[name]||0); fq+=qty; fc+=cost;
+    const q=document.querySelector(`[data-out="shopqty-${name}"]`);
+    const c=document.querySelector(`[data-out="shopcost-${name}"]`);
+    if(q){ q.textContent=fmt(qty); q.style.color=stackColor(qty); }
+    if(c) c.textContent=fmt(cost);
+  });
+  document.getElementById("foot-qty").textContent=fmt(fq);
+  document.getElementById("foot-cost").textContent=fmt(fc);
+  const rank=Object.entries(itemTotals).map(([n,q])=>[n,q*(PRICES[n]||0)]).sort((a,b)=>b[1]-a[1]).slice(0,3).filter(x=>x[1]>0).map(([n,c])=>`${n} (${gpCompact(c)})`);
+  document.getElementById("head-note").innerHTML=rank.length?`Biggest cost drivers now: <b>${rank.join(" · ")}</b>. Herblore &amp; Smithing recoup most of their outlay on resale — net spend is lower.`:`No costed supplies selected yet.`;
+}
+
+// ---- stat updating ----
+function setStatus(msg,cls){ const s=document.getElementById("status"); s.textContent=msg; s.className="status "+(cls||"info"); }
+function setCur(name,xp){ for(const arr of [SKILLS,GATHER,SPECIAL]){ const o=arr.find(s=>s.name===name); if(o){ o.cur=xp; return true; } } return false; }
+function applyMap(map){
+  let n=0; Object.entries(map).forEach(([k,v])=>{ if(typeof v==="number"&&v>=0&&setCur(k,v)) n++; });
+  renderSkills(); renderGather(); refresh(); return n;
+}
+function parseStatsJSON(text){
+  const json=JSON.parse(text);
+  // TempleOSRS: { data: { Cooking: <xp>, ... , Overall: ... } }
+  if(json&&json.data&&typeof json.data.Overall!=="undefined"){
+    const map={}; NAMES.forEach(n=>{ const v=json.data[n]; if(typeof v==="number") map[n]=v; });
+    if(json.data.player_name_with_capitalization) map.__name=json.data.player_name_with_capitalization;
+    return map;
+  }
+  // Wise Old Man player: { latestSnapshot: { data: { skills: { cooking:{experience}, ... } } } }
+  const skills=json?.latestSnapshot?.data?.skills || json?.data?.skills || json?.skills;
+  if(skills&&typeof skills==="object"){
+    const map={}; NAMES.forEach(n=>{ const key=n==="Runecraft"?"runecrafting":n.toLowerCase(); const s=skills[key]; if(s&&typeof s.experience==="number") map[n]=s.experience; });
+    if(json.displayName) map.__name=json.displayName;
+    return map;
+  }
+  throw new Error("Unrecognised format — expected a TempleOSRS or Wise Old Man response.");
+}
+function setAcctName(nm){ if(nm){ document.getElementById("acct-name").textContent=nm; document.getElementById("rsn-in").value=nm; } }
+
+document.getElementById("btn-json").addEventListener("click",()=>{
+  const txt=document.getElementById("json-in").value.trim();
+  if(!txt){ setStatus("Paste a JSON response first.","err"); return; }
+  try{
+    const map=parseStatsJSON(txt);
+    const nm=map.__name; delete map.__name;
+    const n=applyMap(map);
+    if(nm) setAcctName(nm);
+    setStatus(n?`Updated ${n} skills${nm?" for "+nm:""} from pasted JSON.`:"Parsed, but no skill XP found.", n?"ok":"err");
+  }catch(e){ setStatus("Couldn't read that: "+e.message,"err"); }
+});
+document.getElementById("btn-wom").addEventListener("click",async()=>{
+  const rsn=document.getElementById("rsn-in").value.trim();
+  if(!rsn){ setStatus("Enter an RSN.","err"); return; }
+  const base="https://api.wiseoldman.net/v2/players/"+encodeURIComponent(rsn);
+  setStatus("Updating "+rsn+" on Wise Old Man…","info");
+  let json=null, fresh=false;
+  // POST triggers a fresh pull from the official hiscores and returns the new snapshot.
+  try{
+    const upd=await fetch(base,{method:"POST",headers:{"Content-Type":"application/json"}});
+    if(upd.ok){ json=await upd.json(); fresh=true; }
+  }catch(_){}
+  try{
+    if(!json){ // WOM rate-limited the update (once/min) — fall back to the last cached snapshot.
+      const res=await fetch(base,{headers:{"Accept":"application/json"}});
+      if(!res.ok) throw new Error("HTTP "+res.status+(res.status===404?" (not tracked on WOM — add it there first)":""));
+      json=await res.json();
+    }
+    const map=parseStatsJSON(JSON.stringify(json));
+    const nm=map.__name||rsn; delete map.__name;
+    const n=applyMap(map);
+    setAcctName(nm);
+    setStatus(n?`${fresh?"Live-refreshed":"Loaded cached snapshot for"} ${nm} — ${n} skills${fresh?" pulled fresh from the hiscores":" (WOM limits fresh pulls to once/min; try again shortly)"}.`:"Fetched, but no skills parsed.", n?"ok":"err");
+  }catch(e){ setStatus("Live fetch failed ("+e.message+"). Inside the Claude app the sandbox blocks this — on GitHub Pages it works. Paste JSON as a fallback.","err"); }
+});
+document.getElementById("btn-reset").addEventListener("click",()=>{
+  Object.entries(LOADED).forEach(([k,v])=>setCur(k,v));
+  setAcctName("24 Weetbix");
+  renderSkills(); renderGather(); refresh();
+  setStatus("Reset to the originally loaded 24 Weetbix snapshot.","info");
+});
+
+// ---- inputs ----
+document.addEventListener("input",e=>{
+  const t=e.target;
+  if(t.dataset.f){
+    const leg=sel(SKILLS[+t.dataset.si]).legs[+t.dataset.li];
+    if(t.dataset.f==="xpPer") leg.xpPer=parseFloat(t.value)||0;
+    else if(t.dataset.f==="per") leg.items[+t.dataset.ii].per=parseFloat(t.value)||0;
+    refresh();
+  } else if(t.dataset.price){ PRICES[t.dataset.price]=parseFloat(t.value)||0; refresh(); }
+});
+document.addEventListener("change",e=>{
+  const t=e.target;
+  if(t.classList.contains("method")){ SKILLS[+t.dataset.si].sel=+t.value; renderSkills(); refresh(); }
+  else if(t.dataset.lvl!==undefined){
+    const lv=Math.max(1,Math.min(99,parseInt(t.value)||1));
+    SKILLS[+t.dataset.lvl].cur=xpForLevel(lv);
+    renderSkills(); refresh();
+  }
+});
+
+renderSkills(); renderGather(); renderShop(compute().itemTotals); refresh();
+</script>
+</body>
+</html>
