@@ -106,6 +106,8 @@
   .mini-card.blocked{border-color:#4a3128}
   .mini-card.blocked .nm{color:var(--red)}
   .mini-card.special{border-color:#3c3a24}
+  .mini-card.done{border-color:#2f4a2a}
+  .mini-card.done .tag{color:var(--green)}
   .mini-card .tag{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
   .mini-note{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.45}
 
@@ -301,8 +303,12 @@ const GATHER=[
   {name:"Agility",cur:17575},{name:"Thieving",cur:7958},{name:"Runecraft",cur:0},{name:"Hunter",cur:1000}
 ];
 const SPECIAL=[
-  {name:"Farming",cur:0,kind:"special",note:"Run-based over many days (tree + herb runs), not a bulk grind. Ballpark: a few hundred tree/fruit-tree seeds + several thousand herb seeds. Plan by runs, not one order."},
-  {name:"Slayer",cur:1180,kind:"blocked",note:"Requires combat. This build is 1 Attack / 1 Strength / 1 Ranged / 1 Magic — Slayer to 99 isn't feasible without training a combat style first."}
+  {name:"Farming",cur:0,note:(lvl,rem)=>rem>0
+    ?`From level ${lvl}: run-based over many days (tree + herb runs), not a bulk grind — a few hundred tree/fruit-tree seeds plus several thousand herb seeds. Plan by runs, not one order.`
+    :"Already 99 — no more runs to plan."},
+  {name:"Slayer",cur:1180,note:(lvl,rem)=>rem>0
+    ?`At level ${lvl}: combat-based, trained on Slayer assignments rather than bought off the GE, so it isn't costed here. Budget consumables (prayer potions, food, cannonballs) by whichever combat style you use.`
+    :"Already 99 — nothing to buy."}
 ];
 const NAMES=[...SKILLS,...GATHER,...SPECIAL].map(s=>s.name);
 // snapshot of initially-loaded stats for the reset button
@@ -377,8 +383,10 @@ function renderGather(){
     return `<div class="mini-card"><div class="nm">${g.name}</div><div class="rw">${lvl} → 99 · ${rem>0?fmt(rem)+" xp":"done"}</div><div class="mini-note">Gathered, not bought — no shopping list.</div></div>`;
   }).join("");
   document.getElementById("special").innerHTML=SPECIAL.map(s=>{
-    const lvl=levelFromXp(s.cur),rem=Math.max(0,XP99-s.cur),cls=s.kind==="blocked"?"blocked":"special",tag=s.kind==="blocked"?"blocked":"planning note";
-    return `<div class="mini-card ${cls}"><div class="tag">${tag}</div><div class="nm">${s.name}</div><div class="rw">${lvl} → 99 · ${rem>0?fmt(rem)+" xp":"done"}</div><div class="mini-note">${s.note}</div></div>`;
+    const lvl=levelFromXp(s.cur),rem=Math.max(0,XP99-s.cur),done=rem===0;
+    const cls=done?"done":"special",tag=done?"done":"planning note";
+    const note=typeof s.note==="function"?s.note(lvl,rem):s.note;
+    return `<div class="mini-card ${cls}"><div class="tag">${tag}</div><div class="nm">${s.name}</div><div class="rw">${lvl} → 99 · ${done?"done":fmt(rem)+" xp"}</div><div class="mini-note">${note}</div></div>`;
   }).join("");
 }
 
