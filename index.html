@@ -80,6 +80,9 @@
   .method-bar label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
   select.method{background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:system-ui,sans-serif;font-size:14px;padding:6px 10px;border-radius:6px;min-width:230px;cursor:pointer}
   select.method:focus{outline:none;border-color:var(--gold)}
+  select.band-sel{background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:system-ui,sans-serif;font-size:13px;padding:4px 9px;border-radius:6px;min-width:180px;cursor:pointer}
+  select.band-sel:focus{outline:none;border-color:var(--gold)}
+  .leg-done{opacity:.5}
   .gap-flag{font-family:var(--mono);font-size:11.5px;color:var(--red)}
 
   .leg{padding:12px 16px;border-bottom:1px solid var(--line)}
@@ -167,7 +170,7 @@
   </section>
 
   <section>
-    <h2 class="sec-title">Supply skills — choose your method</h2>
+    <h2 class="sec-title">Supply skills — pick a method per level band</h2>
     <div id="skills"></div>
   </section>
 
@@ -246,109 +249,102 @@ const ITEM_IDS={
 };
 
 const SKILLS=[
-  {name:"Cooking",cur:2753655,sel:0,methods:[
-    {name:"Full 1→99 — fish → karambwans",req:1,legs:[
-      {from:1,to:15,xpPer:30,items:[{name:"Raw shrimps",per:1}]},
-      {from:15,to:25,xpPer:70,items:[{name:"Raw trout",per:1}]},
-      {from:25,to:30,xpPer:90,items:[{name:"Raw salmon",per:1}]},
-      {from:30,to:99,xpPer:190,items:[{name:"Raw karambwan",per:1}]}]},
-    {name:"Raw karambwan (190xp)",req:30,legs:[{from:30,to:99,xpPer:190,items:[{name:"Raw karambwan",per:1}]}]},
-    {name:"Jugs of wine (200xp)",req:35,legs:[{from:35,to:99,xpPer:200,items:[{name:"Grapes",per:1},{name:"Jug of water",per:1}]}]},
-    {name:"Cook sharks (210xp)",req:80,legs:[{from:80,to:99,xpPer:210,items:[{name:"Raw shark",per:1}]}]},
-    {name:"Cook lobsters (120xp)",req:40,legs:[{from:40,to:99,xpPer:120,items:[{name:"Raw lobster",per:1}]}]},
-    {name:"Cook swordfish (140xp)",req:45,legs:[{from:45,to:99,xpPer:140,items:[{name:"Raw swordfish",per:1}]}]},
-    {name:"Cook monkfish (150xp)",req:62,legs:[{from:62,to:99,xpPer:150,items:[{name:"Raw monkfish",per:1}]}]},
-    {name:"Cook anglerfish (230xp)",req:84,legs:[{from:84,to:99,xpPer:230,items:[{name:"Raw anglerfish",per:1}]}]},
-    {name:"Summer pies (260xp)",req:95,legs:[{from:95,to:99,xpPer:260,items:[{name:"Raw summer pie",per:1}]}]}
-  ]},
-  {name:"Fletching",cur:408813,sel:0,methods:[
-    {name:"Full 1→99 — bows (cut + string)",req:1,legs:[
-      {from:1,to:20,xpPer:10,items:[{name:"Logs",per:1},{name:"Bow string",per:1}]},
-      {from:20,to:40,xpPer:33,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]},
-      {from:40,to:55,xpPer:83,items:[{name:"Willow logs",per:1},{name:"Bow string",per:1}]},
-      {from:55,to:70,xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]},
-      {from:70,to:99,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]}]},
-    {name:"Yew longbows (135xp)",req:70,legs:[{from:70,to:99,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]}]},
-    {name:"Magic longbows (183xp)",req:85,legs:[{from:85,to:99,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]}]},
-    {name:"Adamant darts (15xp)",req:61,legs:[{from:61,to:99,xpPer:15,items:[{name:"Adamant dart tip",per:1},{name:"Feather",per:1}]}]},
-    {name:"Rune darts (18.8xp)",req:81,legs:[{from:81,to:99,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]}]},
-    {name:"Maple longbows (116.6xp)",req:55,legs:[{from:55,to:99,xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]}]},
-    {name:"Dragon darts (25xp)",req:95,legs:[{from:95,to:99,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]},
-    {name:"Mithril darts (11.2xp)",req:52,legs:[{from:52,to:99,xpPer:11.2,items:[{name:"Mithril dart tip",per:1},{name:"Feather",per:1}]}]}
-  ]},
-  {name:"Crafting",cur:3002,sel:0,methods:[
-    {name:"Full 1→99 — leather → gems → d'hide",req:1,legs:[
-      {from:1,to:20,xpPer:13.8,items:[{name:"Leather",per:1}]},
-      {from:20,to:27,xpPer:50,items:[{name:"Uncut sapphire",per:1}]},
-      {from:27,to:34,xpPer:67.5,items:[{name:"Uncut emerald",per:1}]},
-      {from:34,to:43,xpPer:85,items:[{name:"Uncut ruby",per:1}]},
-      {from:43,to:63,xpPer:107.5,items:[{name:"Uncut diamond",per:1}]},
-      {from:63,to:66,xpPer:148,items:[{name:"Green dragon leather",per:3}]},
-      {from:66,to:73,xpPer:210,items:[{name:"Blue dragon leather",per:3}]},
-      {from:73,to:79,xpPer:258,items:[{name:"Red dragon leather",per:3}]},
-      {from:79,to:99,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]},
-    {name:"Green d'hide bodies (148xp)",req:63,legs:[{from:63,to:99,xpPer:148,items:[{name:"Green dragon leather",per:3}]}]},
-    {name:"Blue d'hide bodies (210xp)",req:66,legs:[{from:66,to:99,xpPer:210,items:[{name:"Blue dragon leather",per:3}]}]},
-    {name:"Red d'hide bodies (258xp)",req:73,legs:[{from:73,to:99,xpPer:258,items:[{name:"Red dragon leather",per:3}]}]},
-    {name:"Black d'hide bodies (306xp)",req:79,legs:[{from:79,to:99,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]},
-    {name:"Air battlestaves (137.5xp)",req:66,legs:[{from:66,to:99,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]}]},
-    {name:"Cut diamonds (107.5xp)",req:43,legs:[{from:43,to:99,xpPer:107.5,items:[{name:"Uncut diamond",per:1}]}]},
-    {name:"Cut dragonstones (137.5xp)",req:55,legs:[{from:55,to:99,xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]},
-    {name:"Empty light orbs (70xp)",req:87,legs:[{from:87,to:99,xpPer:70,items:[{name:"Molten glass",per:1}]}]}
-  ]},
-  {name:"Smithing",cur:12743,sel:0,methods:[
-    {name:"Full 1→99 — bars (Blast Furnace)",req:1,legs:[
-      {from:1,to:30,xpPer:6.2,items:[{name:"Copper ore",per:1},{name:"Tin ore",per:1}]},
-      {from:30,to:40,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]},
-      {from:40,to:99,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
-    {name:"Gold bars — BF (56.2xp)",req:40,legs:[{from:40,to:99,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
-    {name:"Steel bars — BF (17.5xp)",req:30,legs:[{from:30,to:99,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]}]},
-    {name:"Rune bars — BF (50xp)",req:85,legs:[{from:85,to:99,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]},
-    {name:"Cannonballs (25.6xp)",req:35,legs:[{from:35,to:99,xpPer:25.6,items:[{name:"Steel bar",per:1}]}]},
-    {name:"Mithril bars — BF (30xp)",req:50,legs:[{from:50,to:99,xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]}]},
-    {name:"Adamant bars — BF (37.5xp)",req:70,legs:[{from:70,to:99,xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]}]},
-    {name:"Adamant platebodies (187.5xp)",req:88,legs:[{from:88,to:99,xpPer:187.5,items:[{name:"Adamant bar",per:5}]}]}
-  ]},
-  {name:"Herblore",cur:4045,sel:0,methods:[
-    {name:"Full 1→99 — potions",req:1,legs:[
-      {from:1,to:12,xpPer:25,items:[{name:"Guam leaf",per:1},{name:"Eye of newt",per:1}]},
-      {from:12,to:38,xpPer:50,items:[{name:"Tarromin",per:1},{name:"Limpwurt root",per:1}]},
-      {from:38,to:99,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]}]},
-    {name:"Prayer potions (142.5xp)",req:38,legs:[{from:38,to:99,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]}]},
-    {name:"Super restores (142.5xp)",req:63,legs:[{from:63,to:99,xpPer:142.5,items:[{name:"Snapdragon",per:1},{name:"Red spiders' eggs",per:1}]}]},
-    {name:"Saradomin brews (180xp)",req:81,legs:[{from:81,to:99,xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]}]},
-    {name:"Super combat (150xp)",req:90,legs:[{from:90,to:99,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]},
-    {name:"Super strength (125xp)",req:55,legs:[{from:55,to:99,xpPer:125,items:[{name:"Kwuarm",per:1},{name:"Limpwurt root",per:1}]}]},
-    {name:"Super defence (150xp)",req:66,legs:[{from:66,to:99,xpPer:150,items:[{name:"Cadantine",per:1},{name:"White berries",per:1}]}]},
-    {name:"Ranging potions (162.5xp)",req:72,legs:[{from:72,to:99,xpPer:162.5,items:[{name:"Dwarf weed",per:1},{name:"Wine of zamorak",per:1}]}]},
-    {name:"Magic potions (172.5xp)",req:76,legs:[{from:76,to:99,xpPer:172.5,items:[{name:"Lantadyme",per:1},{name:"Potato cactus",per:1}]}]}
-  ]},
-  {name:"Construction",cur:939,sel:0,methods:[
-    {name:"Full 1→99 — planks",req:1,legs:[
-      {from:1,to:33,xpPer:58,items:[{name:"Plank",per:2}]},
-      {from:33,to:52,xpPer:480,items:[{name:"Oak plank",per:8}]},
-      {from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]},
-    {name:"Oak larders → Mahogany tables",req:33,legs:[
-      {from:33,to:52,xpPer:480,items:[{name:"Oak plank",per:8}]},
-      {from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]},
-    {name:"Oak larders only (cheapest)",req:33,legs:[{from:33,to:99,xpPer:480,items:[{name:"Oak plank",per:8}]}]},
-    {name:"Mahogany tables (from 52)",req:52,legs:[{from:52,to:99,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]}
-  ]},
-  {name:"Firemaking",cur:101470,sel:0,methods:[
-    {name:"Full 1→99 — burn logs",req:1,legs:[
-      {from:1,to:15,xpPer:40,items:[{name:"Logs",per:1}]},
-      {from:15,to:30,xpPer:60,items:[{name:"Oak logs",per:1}]},
-      {from:30,to:45,xpPer:90,items:[{name:"Willow logs",per:1}]},
-      {from:45,to:60,xpPer:135,items:[{name:"Maple logs",per:1}]},
-      {from:60,to:75,xpPer:202.5,items:[{name:"Yew logs",per:1}]},
-      {from:75,to:99,xpPer:303.8,items:[{name:"Magic logs",per:1}]}]},
-    {name:"Wintertodt (free)",req:50,legs:[{from:50,to:99,xpPer:0,items:[]}]},
-    {name:"Burn magic logs (303.8xp)",req:50,legs:[{from:50,to:99,xpPer:303.8,items:[{name:"Magic logs",per:1}]}]},
-    {name:"Burn yew logs (202.5xp)",req:50,legs:[{from:50,to:99,xpPer:202.5,items:[{name:"Yew logs",per:1}]}]},
-    {name:"Burn maple logs (135xp)",req:50,legs:[{from:50,to:99,xpPer:135,items:[{name:"Maple logs",per:1}]}]},
-    {name:"Burn willow logs (90xp)",req:50,legs:[{from:50,to:99,xpPer:90,items:[{name:"Willow logs",per:1}]}]},
-    {name:"Burn redwood logs (350xp)",req:90,legs:[{from:90,to:99,xpPer:350,items:[{name:"Redwood logs",per:1}]}]}
-  ]}
+  {name:"Cooking",cur:2753655,bands:[
+    {from:1,to:15,sel:0,options:[
+      {label:"Cook shrimps (30xp)",xpPer:30,items:[{name:"Raw shrimps",per:1}]}]},
+    {from:15,to:30,sel:0,options:[
+      {label:"Cook trout (70xp)",xpPer:70,items:[{name:"Raw trout",per:1}]},
+      {label:"Cook salmon (90xp)",xpPer:90,items:[{name:"Raw salmon",per:1}]}]},
+    {from:30,to:99,sel:0,options:[
+      {label:"Cook karambwans (190xp)",xpPer:190,items:[{name:"Raw karambwan",per:1}]},
+      {label:"Jugs of wine (200xp)",xpPer:200,items:[{name:"Grapes",per:1},{name:"Jug of water",per:1}]},
+      {label:"Cook lobsters (120xp)",xpPer:120,items:[{name:"Raw lobster",per:1}]},
+      {label:"Cook swordfish (140xp)",xpPer:140,items:[{name:"Raw swordfish",per:1}]},
+      {label:"Cook monkfish (150xp)",xpPer:150,items:[{name:"Raw monkfish",per:1}]},
+      {label:"Cook sharks (210xp)",xpPer:210,items:[{name:"Raw shark",per:1}]},
+      {label:"Cook anglerfish (230xp)",xpPer:230,items:[{name:"Raw anglerfish",per:1}]}]}]},
+  {name:"Fletching",cur:408813,bands:[
+    {from:1,to:20,sel:0,options:[
+      {label:"Shortbows (10xp)",xpPer:10,items:[{name:"Logs",per:1},{name:"Bow string",per:1}]}]},
+    {from:20,to:40,sel:0,options:[
+      {label:"Oak shortbows (33xp)",xpPer:33,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]},
+      {label:"Oak longbows (50xp)",xpPer:50,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]}]},
+    {from:40,to:55,sel:0,options:[
+      {label:"Willow longbows (83xp)",xpPer:83,items:[{name:"Willow logs",per:1},{name:"Bow string",per:1}]}]},
+    {from:55,to:70,sel:0,options:[
+      {label:"Maple longbows (116.6xp)",xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]}]},
+    {from:70,to:99,sel:0,options:[
+      {label:"Yew longbows (135xp)",xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]},
+      {label:"Magic longbows (183xp)",xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]},
+      {label:"Adamant darts (15xp)",xpPer:15,items:[{name:"Adamant dart tip",per:1},{name:"Feather",per:1}]},
+      {label:"Rune darts (18.8xp)",xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]},
+      {label:"Dragon darts (25xp)",xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]}]},
+  {name:"Crafting",cur:3002,bands:[
+    {from:1,to:20,sel:0,options:[
+      {label:"Leather gloves (13.8xp)",xpPer:13.8,items:[{name:"Leather",per:1}]},
+      {label:"Leather bodies (25xp)",xpPer:25,items:[{name:"Leather",per:1}]}]},
+    {from:20,to:40,sel:0,options:[
+      {label:"Cut sapphires (50xp)",xpPer:50,items:[{name:"Uncut sapphire",per:1}]},
+      {label:"Cut emeralds (67.5xp)",xpPer:67.5,items:[{name:"Uncut emerald",per:1}]},
+      {label:"Cut rubies (85xp)",xpPer:85,items:[{name:"Uncut ruby",per:1}]}]},
+    {from:40,to:63,sel:0,options:[
+      {label:"Cut diamonds (107.5xp)",xpPer:107.5,items:[{name:"Uncut diamond",per:1}]},
+      {label:"Cut dragonstones (137.5xp)",xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]},
+    {from:63,to:99,sel:0,options:[
+      {label:"Black d'hide bodies (306xp)",xpPer:306,items:[{name:"Black dragon leather",per:3}]},
+      {label:"Red d'hide bodies (258xp)",xpPer:258,items:[{name:"Red dragon leather",per:3}]},
+      {label:"Blue d'hide bodies (210xp)",xpPer:210,items:[{name:"Blue dragon leather",per:3}]},
+      {label:"Green d'hide bodies (148xp)",xpPer:148,items:[{name:"Green dragon leather",per:3}]},
+      {label:"Air battlestaves (137.5xp)",xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]},
+      {label:"Cut dragonstones (137.5xp)",xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]}]},
+  {name:"Smithing",cur:12743,bands:[
+    {from:1,to:30,sel:0,options:[
+      {label:"Bronze bars (6.2xp)",xpPer:6.2,items:[{name:"Copper ore",per:1},{name:"Tin ore",per:1}]}]},
+    {from:30,to:50,sel:0,options:[
+      {label:"Steel bars (17.5xp)",xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]},
+      {label:"Gold bars (56.2xp)",xpPer:56.2,items:[{name:"Gold ore",per:1}]},
+      {label:"Mithril bars (30xp)",xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]}]},
+    {from:50,to:99,sel:0,options:[
+      {label:"Gold bars (56.2xp)",xpPer:56.2,items:[{name:"Gold ore",per:1}]},
+      {label:"Mithril bars (30xp)",xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]},
+      {label:"Adamant bars (37.5xp)",xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]},
+      {label:"Rune bars (50xp)",xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]},
+      {label:"Cannonballs (25.6xp)",xpPer:25.6,items:[{name:"Steel bar",per:1}]}]}]},
+  {name:"Herblore",cur:4045,bands:[
+    {from:1,to:12,sel:0,options:[
+      {label:"Attack potions (25xp)",xpPer:25,items:[{name:"Guam leaf",per:1},{name:"Eye of newt",per:1}]}]},
+    {from:12,to:38,sel:0,options:[
+      {label:"Strength potions (50xp)",xpPer:50,items:[{name:"Tarromin",per:1},{name:"Limpwurt root",per:1}]}]},
+    {from:38,to:99,sel:0,options:[
+      {label:"Prayer potions (142.5xp)",xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]},
+      {label:"Super strength (125xp)",xpPer:125,items:[{name:"Kwuarm",per:1},{name:"Limpwurt root",per:1}]},
+      {label:"Super restores (142.5xp)",xpPer:142.5,items:[{name:"Snapdragon",per:1},{name:"Red spiders' eggs",per:1}]},
+      {label:"Super defence (150xp)",xpPer:150,items:[{name:"Cadantine",per:1},{name:"White berries",per:1}]},
+      {label:"Ranging potions (162.5xp)",xpPer:162.5,items:[{name:"Dwarf weed",per:1},{name:"Wine of zamorak",per:1}]},
+      {label:"Magic potions (172.5xp)",xpPer:172.5,items:[{name:"Lantadyme",per:1},{name:"Potato cactus",per:1}]},
+      {label:"Saradomin brews (180xp)",xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]},
+      {label:"Super combat (150xp)",xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]}]},
+  {name:"Construction",cur:939,bands:[
+    {from:1,to:33,sel:0,options:[
+      {label:"Crude wooden chairs (58xp)",xpPer:58,items:[{name:"Plank",per:2}]}]},
+    {from:33,to:52,sel:0,options:[
+      {label:"Oak larders (480xp)",xpPer:480,items:[{name:"Oak plank",per:8}]}]},
+    {from:52,to:99,sel:0,options:[
+      {label:"Mahogany tables (840xp)",xpPer:840,items:[{name:"Mahogany plank",per:6}]},
+      {label:"Oak larders (480xp)",xpPer:480,items:[{name:"Oak plank",per:8}]}]}]},
+  {name:"Firemaking",cur:101470,bands:[
+    {from:1,to:15,sel:0,options:[
+      {label:"Burn logs (40xp)",xpPer:40,items:[{name:"Logs",per:1}]}]},
+    {from:15,to:30,sel:0,options:[
+      {label:"Burn oak logs (60xp)",xpPer:60,items:[{name:"Oak logs",per:1}]}]},
+    {from:30,to:45,sel:0,options:[
+      {label:"Burn willow logs (90xp)",xpPer:90,items:[{name:"Willow logs",per:1}]}]},
+    {from:45,to:99,sel:0,options:[
+      {label:"Wintertodt (free)",xpPer:0,items:[]},
+      {label:"Burn maple logs (135xp)",xpPer:135,items:[{name:"Maple logs",per:1}]},
+      {label:"Burn yew logs (202.5xp)",xpPer:202.5,items:[{name:"Yew logs",per:1}]},
+      {label:"Burn magic logs (303.8xp)",xpPer:303.8,items:[{name:"Magic logs",per:1}]},
+      {label:"Burn redwood logs (350xp)",xpPer:350,items:[{name:"Redwood logs",per:1}]}]}]}
 ];
 const GATHER=[
   {name:"Woodcutting",cur:85},{name:"Fishing",cur:18294},{name:"Mining",cur:18813},
@@ -366,7 +362,6 @@ const NAMES=[...SKILLS,...GATHER,...SPECIAL].map(s=>s.name);
 // snapshot of initially-loaded stats for the reset button
 const LOADED=Object.fromEntries([...SKILLS,...GATHER,...SPECIAL].map(s=>[s.name,s.cur]));
 
-const sel=sk=>sk.methods[sk.sel];
 function levelFromXp(xp){ for(let l=99;l>=1;l--){ if(xp>=xpForLevel(l)) return l; } return 1; }
 function stackColor(n){ return n>=1e7?"var(--stack-green)":n>=1e5?"var(--stack-white)":"var(--stack-yellow)"; }
 function gpCompact(n){ const s=n<0?"-":""; n=Math.abs(n);
@@ -376,14 +371,14 @@ function gpCompact(n){ const s=n<0?"-":""; n=Math.abs(n);
   return s+n.toString(); }
 const fmt=n=>Math.round(n).toLocaleString("en-US");
 
-function legXp(sk,leg){ const f=Math.max(xpForLevel(leg.from),sk.cur); return Math.max(0,xpForLevel(leg.to)-f); }
+function rangeXp(cur,from,to){ const f=Math.max(xpForLevel(from),cur); return Math.max(0,xpForLevel(to)-f); }
 function compute(){
   const itemTotals={}; let grand=0;
   SKILLS.forEach(sk=>{ sk._sub=0;
-    sel(sk).legs.forEach(leg=>{
-      const xp=legXp(sk,leg);
-      leg._actions=leg.xpPer>0?Math.ceil(xp/leg.xpPer):0;
-      leg._items=leg.items.map(it=>{ const qty=leg._actions*it.per; const cost=qty*(PRICES[it.name]||0);
+    sk.bands.forEach(b=>{
+      const opt=b.options[b.sel], xp=rangeXp(sk.cur,b.from,b.to);
+      opt._actions=opt.xpPer>0?Math.ceil(xp/opt.xpPer):0;
+      opt._items=opt.items.map(it=>{ const qty=opt._actions*it.per; const cost=qty*(PRICES[it.name]||0);
         itemTotals[it.name]=(itemTotals[it.name]||0)+qty; sk._sub+=cost; grand+=cost; return {name:it.name,qty,cost}; });
     });
   });
@@ -392,21 +387,20 @@ function compute(){
 
 function renderSkills(){
   document.getElementById("skills").innerHTML=SKILLS.map((sk,si)=>{
-    const lvl=levelFromXp(sk.cur),rem=Math.max(0,XP99-sk.cur),m=sel(sk);
-    const firstFrom=Math.min(...m.legs.map(l=>l.from));
-    const gap=firstFrom>lvl?`<span class="gap-flag">↳ lvl ${lvl}→${firstFrom} not costed</span>`:"";
-    const opts=sk.methods.map((mm,i)=>`<option value="${i}" ${i===sk.sel?"selected":""}>${mm.name}</option>`).join("");
-    const legs=m.legs.map((leg,li)=>{
-      const hasItems=leg.items.length>0;
-      const items=leg.items.map((it,ii)=>`
+    const lvl=levelFromXp(sk.cur),rem=Math.max(0,XP99-sk.cur);
+    const bands=sk.bands.map((b,bi)=>{
+      const opt=b.options[b.sel],hasItems=opt.items.length>0,done=xpForLevel(b.to)<=sk.cur;
+      const opts=b.options.map((o,i)=>`<option value="${i}" ${i===b.sel?"selected":""}>${o.label}</option>`).join("");
+      const items=opt.items.map((it,ii)=>`
         <div class="item-row"><span class="nm">${it.name}</span>
-          <span class="per">× <input class="num-in sm" type="number" min="0" step="0.1" data-si="${si}" data-li="${li}" data-ii="${ii}" data-f="per" value="${it.per}"> / action</span>
-          <span class="tot" data-out="qty-${si}-${li}-${ii}"></span>
-          <span class="cost" data-out="cost-${si}-${li}-${ii}"></span></div>`).join("");
-      return `<div class="leg"><div class="leg-top">
-          <span class="leg-range">lvl ${leg.from}→${leg.to}</span>
-          ${hasItems?`<span class="xpper">xp/action <input class="num-in" type="number" min="0.1" step="0.1" data-si="${si}" data-li="${li}" data-f="xpPer" value="${leg.xpPer}"></span>`:`<span class="free">Wintertodt — no supplies to buy</span>`}
-          ${hasItems?`<span class="leg-actions" data-out="act-${si}-${li}"></span>`:""}
+          <span class="per">× <input class="num-in sm" type="number" min="0" step="0.1" data-si="${si}" data-bi="${bi}" data-ii="${ii}" data-f="per" value="${it.per}"> / action</span>
+          <span class="tot" data-out="qty-${si}-${bi}-${ii}"></span>
+          <span class="cost" data-out="cost-${si}-${bi}-${ii}"></span></div>`).join("");
+      return `<div class="leg${done?" leg-done":""}"><div class="leg-top">
+          <span class="leg-range">lvl ${b.from}→${b.to}</span>
+          <select class="band-sel" data-si="${si}" data-bi="${bi}">${opts}</select>
+          ${hasItems?`<span class="xpper">xp/action <input class="num-in" type="number" min="0.1" step="0.1" data-si="${si}" data-bi="${bi}" data-f="xpPer" value="${opt.xpPer}"></span>`:`<span class="free">free — no supplies to buy</span>`}
+          ${hasItems?`<span class="leg-actions" data-out="act-${si}-${bi}"></span>`:""}
         </div>${hasItems?`<div class="items">${items}</div>`:""}</div>`;
     }).join("");
     return `<div class="skill">
@@ -416,8 +410,7 @@ function renderSkills(){
           <span class="xp-rem">${rem>0?fmt(rem)+" xp to go":"99 — done"}</span>
           <span class="skill-sub" data-out="sub-${si}"></span>
         </div>
-        <div class="method-bar"><label>Method</label><select class="method" data-si="${si}">${opts}</select>${gap}</div>
-        ${legs}</div>`;
+        ${bands}</div>`;
   }).join("");
 }
 
@@ -449,12 +442,13 @@ function refresh(){
   SKILLS.forEach((sk,si)=>{
     const subEl=document.querySelector(`[data-out="sub-${si}"]`);
     if(subEl) subEl.textContent=sk._sub>0?gpCompact(sk._sub)+" gp":"free";
-    sel(sk).legs.forEach((leg,li)=>{
-      const actEl=document.querySelector(`[data-out="act-${si}-${li}"]`);
-      if(actEl) actEl.textContent=fmt(leg._actions)+" actions";
-      leg._items.forEach((it,ii)=>{
-        const q=document.querySelector(`[data-out="qty-${si}-${li}-${ii}"]`);
-        const c=document.querySelector(`[data-out="cost-${si}-${li}-${ii}"]`);
+    sk.bands.forEach((b,bi)=>{
+      const opt=b.options[b.sel];
+      const actEl=document.querySelector(`[data-out="act-${si}-${bi}"]`);
+      if(actEl) actEl.textContent=fmt(opt._actions)+" actions";
+      (opt._items||[]).forEach((it,ii)=>{
+        const q=document.querySelector(`[data-out="qty-${si}-${bi}-${ii}"]`);
+        const c=document.querySelector(`[data-out="cost-${si}-${bi}-${ii}"]`);
         if(q){ q.textContent=fmt(it.qty); q.style.color=stackColor(it.qty); }
         if(c) c.textContent=it.cost>0?gpCompact(it.cost)+" gp":"";
       });
@@ -546,15 +540,15 @@ document.getElementById("btn-reset").addEventListener("click",()=>{
 document.addEventListener("input",e=>{
   const t=e.target;
   if(t.dataset.f){
-    const leg=sel(SKILLS[+t.dataset.si]).legs[+t.dataset.li];
-    if(t.dataset.f==="xpPer") leg.xpPer=parseFloat(t.value)||0;
-    else if(t.dataset.f==="per") leg.items[+t.dataset.ii].per=parseFloat(t.value)||0;
+    const b=SKILLS[+t.dataset.si].bands[+t.dataset.bi], opt=b.options[b.sel];
+    if(t.dataset.f==="xpPer") opt.xpPer=parseFloat(t.value)||0;
+    else if(t.dataset.f==="per") opt.items[+t.dataset.ii].per=parseFloat(t.value)||0;
     refresh();
   } else if(t.dataset.price){ PRICES[t.dataset.price]=parseFloat(t.value)||0; refresh(); }
 });
 document.addEventListener("change",e=>{
   const t=e.target;
-  if(t.classList.contains("method")){ SKILLS[+t.dataset.si].sel=+t.value; renderSkills(); refresh(); }
+  if(t.classList.contains("band-sel")){ const b=SKILLS[+t.dataset.si].bands[+t.dataset.bi]; b.sel=+t.value; renderSkills(); refresh(); }
   else if(t.dataset.lvl!==undefined){
     const sk=SKILLS[+t.dataset.lvl];
     const lv=Math.max(1,Math.min(99,parseInt(t.value)||1));
