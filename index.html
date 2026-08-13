@@ -229,6 +229,9 @@ const PRICES={
   "Logs":60,"Oak logs":30,
   "Copper ore":45,"Tin ore":45,
   "Guam leaf":20,"Eye of newt":15,"Tarromin":100,
+  "Marrentill":20,"Harralander":100,"Irit leaf":50,"Avantoe":1500,
+  "Unicorn horn dust":300,"Chocolate dust":50,"Mort myre fungus":400,"Dragon scale dust":200,
+  "Amethyst dart tip":120,
   "Plank":100,
   "Bronze dart tip":10,"Iron dart tip":15,"Steel dart tip":20,
   "Uncut opal":300,"Uncut jade":400,"Uncut red topaz":500,"Uncut onyx":2700000,
@@ -258,7 +261,10 @@ const ITEM_IDS={
   "Raw shrimps":317,"Raw trout":335,"Raw salmon":331,
   "Logs":1511,"Oak logs":1521,
   "Copper ore":436,"Tin ore":438,
-  "Guam leaf":249,"Eye of newt":221,"Tarromin":259,
+  "Guam leaf":249,"Eye of newt":221,"Tarromin":253,
+  "Marrentill":251,"Harralander":255,"Irit leaf":259,"Avantoe":261,
+  "Unicorn horn dust":235,"Chocolate dust":1975,"Mort myre fungus":1420,"Dragon scale dust":241,
+  "Amethyst dart tip":25853,
   "Plank":960,
   "Bronze dart tip":819,"Iron dart tip":820,"Steel dart tip":821,
   "Uncut opal":1625,"Uncut jade":1627,"Uncut red topaz":1629,"Uncut onyx":6571,
@@ -298,7 +304,8 @@ const SKILLS=[
       {name:"Steel darts",req:37,xpPer:7.5,items:[{name:"Steel dart tip",per:1},{name:"Feather",per:1}]},
       {name:"Mithril darts",req:52,xpPer:11.2,items:[{name:"Mithril dart tip",per:1},{name:"Feather",per:1}]},
       {name:"Yew shortbows",req:65,xpPer:67.5,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]},
-      {name:"Magic shortbows",req:80,xpPer:91.5,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]}]}]},
+      {name:"Magic shortbows",req:80,xpPer:91.5,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]},
+      {name:"Amethyst darts",req:90,xpPer:21.2,items:[{name:"Amethyst dart tip",per:1},{name:"Feather",per:1}]}]}]},
   {name:"Crafting",cur:3002,bands:[
     {from:1,to:99,sel:11,options:[
       {name:"Leather gloves",req:1,xpPer:13.8,items:[{name:"Leather",per:1}]},
@@ -319,7 +326,9 @@ const SKILLS=[
       {name:"Water battlestaves",req:54,xpPer:150,items:[{name:"Battlestaff",per:1},{name:"Water orb",per:1}]},
       {name:"Earth battlestaves",req:58,xpPer:162.5,items:[{name:"Battlestaff",per:1},{name:"Earth orb",per:1}]},
       {name:"Fire battlestaves",req:62,xpPer:175,items:[{name:"Battlestaff",per:1},{name:"Fire orb",per:1}]},
-      {name:"Cut onyx",req:67,xpPer:167.5,items:[{name:"Uncut onyx",per:1}]}]}]},
+      {name:"Cut onyx",req:67,xpPer:167.5,items:[{name:"Uncut onyx",per:1}]},
+      {name:"Unpowered orbs (glassblowing)",req:46,xpPer:52.5,items:[{name:"Molten glass",per:1}]},
+      {name:"Empty light orbs (glassblowing)",req:87,xpPer:70,items:[{name:"Molten glass",per:1}]}]}]},
   {name:"Smithing",cur:12743,bands:[
     {from:1,to:99,sel:4,options:[
       {name:"Bronze bars",req:1,xpPer:6.2,items:[{name:"Copper ore",per:1},{name:"Tin ore",per:1}]},
@@ -343,7 +352,13 @@ const SKILLS=[
       {name:"Ranging potions",req:72,xpPer:162.5,items:[{name:"Dwarf weed",per:1},{name:"Wine of zamorak",per:1}]},
       {name:"Magic potions",req:76,xpPer:172.5,items:[{name:"Lantadyme",per:1},{name:"Potato cactus",per:1}]},
       {name:"Saradomin brews",req:81,xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]},
-      {name:"Super combat",req:90,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]}]},
+      {name:"Super combat",req:90,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]},
+      {name:"Antipoison",req:5,xpPer:37.5,items:[{name:"Marrentill",per:1},{name:"Unicorn horn dust",per:1}]},
+      {name:"Restore potions",req:22,xpPer:62.5,items:[{name:"Harralander",per:1},{name:"Red spiders' eggs",per:1}]},
+      {name:"Energy potions",req:26,xpPer:67.5,items:[{name:"Harralander",per:1},{name:"Chocolate dust",per:1}]},
+      {name:"Super attack",req:45,xpPer:100,items:[{name:"Irit leaf",per:1},{name:"Eye of newt",per:1}]},
+      {name:"Super energy",req:52,xpPer:117.5,items:[{name:"Avantoe",per:1},{name:"Mort myre fungus",per:1}]},
+      {name:"Antifire potions",req:69,xpPer:157.5,items:[{name:"Lantadyme",per:1},{name:"Dragon scale dust",per:1}]}]}]},
   {name:"Construction",cur:939,bands:[
     {from:1,to:99,sel:4,options:[
       {name:"Crude wooden chairs",req:1,xpPer:58,items:[{name:"Plank",per:2}]},
@@ -353,7 +368,9 @@ const SKILLS=[
       {name:"Mahogany tables",req:52,xpPer:840,items:[{name:"Mahogany plank",per:6}]},
       {name:"Oak dungeon doors",req:74,xpPer:600,items:[{name:"Oak plank",per:10}]},
       {name:"Mahogany Homes — teak (approx)",req:20,xpPer:118,items:[{name:"Teak plank",per:1},{name:"Steel bar",per:0.2}]},
-      {name:"Mahogany Homes — mahogany (approx)",req:50,xpPer:210,items:[{name:"Mahogany plank",per:1},{name:"Steel bar",per:0.3}]}]}]},
+      {name:"Mahogany Homes — mahogany (approx)",req:50,xpPer:210,items:[{name:"Mahogany plank",per:1},{name:"Steel bar",per:0.3}]},
+      {name:"Oak dining tables",req:22,xpPer:240,items:[{name:"Oak plank",per:4}]},
+      {name:"Teak dining tables",req:38,xpPer:540,items:[{name:"Teak plank",per:6}]}]}]},
   {name:"Firemaking",cur:101470,bands:[
     {from:1,to:99,sel:4,options:[
       {name:"Burn logs",req:1,xpPer:40,items:[{name:"Logs",per:1}]},
@@ -392,6 +409,8 @@ const SPECIAL=[
 const NAMES=[...SKILLS,...GATHER,...SPECIAL].map(s=>s.name);
 // snapshot of initially-loaded stats for the reset button
 const LOADED=Object.fromEntries([...SKILLS,...GATHER,...SPECIAL].map(s=>[s.name,s.cur]));
+// per-skill goal level (default = the last band's endpoint, i.e. 99); editable per skill in the UI
+SKILLS.forEach(sk=>{ sk.goal=sk.bands[sk.bands.length-1].to; });
 
 function levelFromXp(xp){ for(let l=99;l>=1;l--){ if(xp>=xpForLevel(l)) return l; } return 1; }
 function stackColor(n){ return n>=1e7?"var(--stack-green)":n>=1e5?"var(--stack-white)":"var(--stack-yellow)"; }
@@ -418,7 +437,7 @@ function compute(){
 
 function renderSkills(){
   document.getElementById("skills").innerHTML=SKILLS.map((sk,si)=>{
-    const lvl=levelFromXp(sk.cur),rem=Math.max(0,XP99-sk.cur);
+    const lvl=levelFromXp(sk.cur),rem=Math.max(0,xpForLevel(sk.goal)-sk.cur);
     const bands=sk.bands.map((b,bi)=>{
       const opt=b.options[b.sel],hasItems=opt.items.length>0,done=xpForLevel(b.to)<=sk.cur;
       const opts=b.options.map((o,i)=>`<option value="${i}" ${i===b.sel?"selected":""}>${o.name} — req ${o.req} · ${o.items.length?o.xpPer+"xp":"free"}</option>`).join("");
@@ -429,7 +448,7 @@ function renderSkills(){
           <span class="tot" data-out="qty-${si}-${bi}-${ii}"></span>
           <span class="cost" data-out="cost-${si}-${bi}-${ii}"></span></div>`).join("");
       const isLast=bi===sk.bands.length-1;
-      const toHtml=isLast?`<b>99</b>`:`<input class="lvl-in band-to" type="number" min="${b.from+1}" max="98" data-si="${si}" data-bi="${bi}" value="${b.to}">`;
+      const toHtml=isLast?`<b>${sk.goal}</b>`:`<input class="lvl-in band-to" type="number" min="${b.from+1}" max="${sk.goal-1}" data-si="${si}" data-bi="${bi}" value="${b.to}">`;
       const ctl=sk.bands.length>1?`<span class="band-ctl"><button class="band-remove" data-si="${si}" data-bi="${bi}" title="Remove this row">×</button></span>`:"";
       return `<div class="leg${done?" leg-done":""}"><div class="leg-top">
           <span class="leg-range">lvl ${b.from}→${toHtml}</span>
@@ -441,8 +460,8 @@ function renderSkills(){
     return `<div class="skill">
         <div class="skill-head">
           <span class="skill-name">${sk.name}</span>
-          <span class="lvl-wrap">lvl <input class="lvl-in" type="number" min="1" max="99" data-lvl="${si}" value="${lvl}"> → 99</span>
-          <span class="xp-rem">${rem>0?fmt(rem)+" xp to go":"99 — done"}</span>
+          <span class="lvl-wrap">lvl <input class="lvl-in" type="number" min="1" max="99" data-lvl="${si}" value="${lvl}"> → <input class="lvl-in goal-in" type="number" min="2" max="99" data-goal="${si}" value="${sk.goal}" title="Goal level"></span>
+          <span class="xp-rem">${rem>0?fmt(rem)+" xp to go":"goal "+sk.goal+" reached"}</span>
           <span class="skill-sub" data-out="sub-${si}"></span>
         </div>
         ${bands}
@@ -594,6 +613,16 @@ document.addEventListener("change",e=>{
     b.to=v; if(next) next.from=v;
     renderSkills(); refresh();
   }
+  else if(t.dataset.goal!==undefined){
+    const sk=SKILLS[+t.dataset.goal];
+    const g=Math.max(2,Math.min(99,parseInt(t.value)||99));
+    // drop any trailing rows that would start at/above the new goal, then pin the last row to it
+    while(sk.bands.length>1&&sk.bands[sk.bands.length-1].from>=g) sk.bands.pop();
+    const last=sk.bands[sk.bands.length-1];
+    if(last.from>=g) last.from=g-1;
+    last.to=g; sk.goal=g;
+    renderSkills(); refresh();
+  }
   else if(t.dataset.lvl!==undefined){
     const sk=SKILLS[+t.dataset.lvl];
     const lv=Math.max(1,Math.min(99,parseInt(t.value)||1));
@@ -666,7 +695,7 @@ function saveState(){
     localStorage.setItem(LS_KEY, JSON.stringify({
       acct: document.getElementById("acct-name").textContent,
       prices: PRICES,
-      skills: SKILLS.map(s=>({name:s.name,cur:s.cur,bands:s.bands})),
+      skills: SKILLS.map(s=>({name:s.name,cur:s.cur,goal:s.goal,bands:s.bands})),
       stats: [...GATHER,...SPECIAL].map(s=>({name:s.name,cur:s.cur}))
     }));
   }catch(_){}
@@ -679,6 +708,8 @@ function loadState(){
     if(Array.isArray(s.skills)) s.skills.forEach(ss=>{ const sk=SKILLS.find(x=>x.name===ss.name); if(!sk) return;
       if(typeof ss.cur==="number") sk.cur=ss.cur;
       if(Array.isArray(ss.bands)&&ss.bands.length) sk.bands=ss.bands;
+      sk.goal=typeof ss.goal==="number"?ss.goal:sk.bands[sk.bands.length-1].to;
+      sk.bands[sk.bands.length-1].to=sk.goal; // keep the last row pinned to the goal level
     });
     if(Array.isArray(s.stats)) s.stats.forEach(ss=>{ for(const arr of [GATHER,SPECIAL]){ const o=arr.find(x=>x.name===ss.name); if(o&&typeof ss.cur==="number") o.cur=ss.cur; } });
     if(typeof s.acct==="string"&&s.acct){ const el=document.getElementById("acct-name"); if(el) el.textContent=s.acct; const r=document.getElementById("rsn-in"); if(r) r.value=s.acct; }

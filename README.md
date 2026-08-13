@@ -1,8 +1,8 @@
 # OSRS Skilling Supply Planner
 
 A single-file web tool that works out **how many of each supply** you need to take
-an Old School RuneScape account to **99 in every non-combat skill** — chained from
-your *current* XP, not just the final method.
+an Old School RuneScape account to a **goal level in every non-combat skill**
+(default 99) — chained from your *current* XP, not just the final method.
 
 Unlike a single-method cost calculator, it counts the whole journey: pick a training
 method per skill and it sums the supplies and GP from where you are now to level 99,
@@ -29,6 +29,11 @@ Open `index.html`. No build step, no dependencies, nothing to install.
 
 **Then:** choose a method per skill from the dropdown and edit any XP rate or GE price.
 The consolidated shopping list and totals recompute live.
+
+**Goal level:** each skill has a goal box in its header (defaults to 99). Lower it to plan a
+partial grind — the range, XP-to-go and shopping list all recost to that target. Split a skill
+into multiple method rows with **+ add row**; lowering the goal below a split point drops the
+rows above it automatically.
 
 ## Host on GitHub Pages
 
