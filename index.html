@@ -196,8 +196,8 @@
   <footer>
     <p><b>Assumptions:</b> main account, buying off the GE. Prices are placeholders — update them to live GE prices before trusting the gp figure.</p>
     <p><b>Level gaps:</b> if a method unlocks above your current level, the levels below it show as “not costed” — switch to a lower-tier method to include them. Editing a level inline snaps to that level's base XP; paste JSON for exact XP.</p>
-    <p><b>Sells back:</b> Smithing bars and Herblore potions recover much of their raw cost on resale. Firemaking defaults to Wintertodt (free); Construction has a cheaper Mahogany Homes route not modelled here.</p>
-    <p><b>Excluded — combat skills (per your goal):</b> Attack, Strength, Defence, Hitpoints, Ranged, Magic, Prayer.</p>
+    <p><b>Sells back:</b> Smithing bars and Herblore potions recover much of their raw cost on resale. Firemaking defaults to Wintertodt (free); Construction includes a Mahogany Homes route (approx — edit the rates to taste). Prayer altar xp assumes a Gilded altar (2 burners, ×3.5); Chaos altar options model the ~50% bone-save.</p>
+    <p><b>Excluded — combat skills (per your goal):</b> Attack, Strength, Defence, Hitpoints, Ranged, Magic.</p>
   </footer>
 </div>
 
@@ -229,14 +229,19 @@ const PRICES={
   "Logs":60,"Oak logs":30,
   "Copper ore":45,"Tin ore":45,
   "Guam leaf":20,"Eye of newt":15,"Tarromin":100,
-  "Plank":100
+  "Plank":100,
+  "Bronze dart tip":10,"Iron dart tip":15,"Steel dart tip":20,
+  "Uncut opal":300,"Uncut jade":400,"Uncut red topaz":500,"Uncut onyx":2700000,
+  "Water orb":1300,"Earth orb":1300,"Fire orb":1300,
+  "Silver ore":65,"Teak plank":800,
+  "Bones":100,"Big bones":300,"Dragon bones":2500,"Wyvern bones":1200,"Dagannoth bones":2000,"Ourg bones":3500,"Superior dragon bones":9000
 };
 
 // OSRS item IDs for live GE price lookups via the wiki prices API.
 const ITEM_IDS={
   "Raw karambwan":3142,"Grapes":1987,"Jug of water":1937,"Raw shark":383,
   "Yew logs":1515,"Magic logs":1513,"Maple logs":1517,"Willow logs":1519,"Bow string":1777,
-  "Adamant dart tip":821,"Rune dart tip":822,"Feather":314,
+  "Adamant dart tip":823,"Rune dart tip":824,"Feather":314,
   "Green dragon leather":1745,"Blue dragon leather":2505,"Red dragon leather":2507,"Black dragon leather":2509,
   "Battlestaff":1391,"Air orb":573,
   "Gold ore":444,"Iron ore":440,"Coal":453,"Runite ore":451,"Steel bar":2353,
@@ -248,13 +253,18 @@ const ITEM_IDS={
   "Mithril ore":447,"Adamantite ore":449,
   "Kwuarm":263,"Limpwurt root":225,"Cadantine":265,"White berries":239,"Dwarf weed":267,"Wine of zamorak":245,
   "Redwood logs":19669,
-  "Raw summer pie":7176,"Mithril dart tip":823,"Molten glass":1775,"Adamant bar":2361,"Lantadyme":2481,"Potato cactus":3138,
+  "Raw summer pie":7176,"Mithril dart tip":822,"Molten glass":1775,"Adamant bar":2361,"Lantadyme":2481,"Potato cactus":3138,
   "Leather":1741,"Uncut sapphire":1623,"Uncut emerald":1621,"Uncut ruby":1619,
   "Raw shrimps":317,"Raw trout":335,"Raw salmon":331,
   "Logs":1511,"Oak logs":1521,
   "Copper ore":436,"Tin ore":438,
   "Guam leaf":249,"Eye of newt":221,"Tarromin":259,
-  "Plank":960
+  "Plank":960,
+  "Bronze dart tip":819,"Iron dart tip":820,"Steel dart tip":821,
+  "Uncut opal":1625,"Uncut jade":1627,"Uncut red topaz":1629,"Uncut onyx":6571,
+  "Water orb":571,"Earth orb":575,"Fire orb":569,
+  "Silver ore":442,"Teak plank":8780,
+  "Bones":526,"Big bones":532,"Dragon bones":536,"Wyvern bones":6812,"Dagannoth bones":6729,"Ourg bones":4834,"Superior dragon bones":22124
 };
 
 const SKILLS=[
@@ -282,7 +292,13 @@ const SKILLS=[
       {name:"Yew longbows",req:70,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]},
       {name:"Rune darts",req:81,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]},
       {name:"Magic longbows",req:85,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]},
-      {name:"Dragon darts",req:95,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]}]},
+      {name:"Dragon darts",req:95,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]},
+      {name:"Bronze darts",req:1,xpPer:1.8,items:[{name:"Bronze dart tip",per:1},{name:"Feather",per:1}]},
+      {name:"Iron darts",req:22,xpPer:3.8,items:[{name:"Iron dart tip",per:1},{name:"Feather",per:1}]},
+      {name:"Steel darts",req:37,xpPer:7.5,items:[{name:"Steel dart tip",per:1},{name:"Feather",per:1}]},
+      {name:"Mithril darts",req:52,xpPer:11.2,items:[{name:"Mithril dart tip",per:1},{name:"Feather",per:1}]},
+      {name:"Yew shortbows",req:65,xpPer:67.5,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]},
+      {name:"Magic shortbows",req:80,xpPer:91.5,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]}]}]},
   {name:"Crafting",cur:3002,bands:[
     {from:1,to:99,sel:11,options:[
       {name:"Leather gloves",req:1,xpPer:13.8,items:[{name:"Leather",per:1}]},
@@ -296,7 +312,14 @@ const SKILLS=[
       {name:"Air battlestaves",req:66,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]},
       {name:"Blue d'hide bodies",req:66,xpPer:210,items:[{name:"Blue dragon leather",per:3}]},
       {name:"Red d'hide bodies",req:73,xpPer:258,items:[{name:"Red dragon leather",per:3}]},
-      {name:"Black d'hide bodies",req:79,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]}]},
+      {name:"Black d'hide bodies",req:79,xpPer:306,items:[{name:"Black dragon leather",per:3}]},
+      {name:"Cut opals",req:1,xpPer:15,items:[{name:"Uncut opal",per:1}]},
+      {name:"Cut jade",req:13,xpPer:20,items:[{name:"Uncut jade",per:1}]},
+      {name:"Cut red topaz",req:16,xpPer:25,items:[{name:"Uncut red topaz",per:1}]},
+      {name:"Water battlestaves",req:54,xpPer:150,items:[{name:"Battlestaff",per:1},{name:"Water orb",per:1}]},
+      {name:"Earth battlestaves",req:58,xpPer:162.5,items:[{name:"Battlestaff",per:1},{name:"Earth orb",per:1}]},
+      {name:"Fire battlestaves",req:62,xpPer:175,items:[{name:"Battlestaff",per:1},{name:"Fire orb",per:1}]},
+      {name:"Cut onyx",req:67,xpPer:167.5,items:[{name:"Uncut onyx",per:1}]}]}]},
   {name:"Smithing",cur:12743,bands:[
     {from:1,to:99,sel:4,options:[
       {name:"Bronze bars",req:1,xpPer:6.2,items:[{name:"Copper ore",per:1},{name:"Tin ore",per:1}]},
@@ -306,7 +329,9 @@ const SKILLS=[
       {name:"Gold bars",req:40,xpPer:56.2,items:[{name:"Gold ore",per:1}]},
       {name:"Mithril bars",req:50,xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]},
       {name:"Adamant bars",req:70,xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]},
-      {name:"Rune bars",req:85,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]}]},
+      {name:"Rune bars",req:85,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]},
+      {name:"Silver bars",req:20,xpPer:13.7,items:[{name:"Silver ore",per:1}]},
+      {name:"Adamant platebodies",req:88,xpPer:187.5,items:[{name:"Adamant bar",per:5}]}]}]},
   {name:"Herblore",cur:4045,bands:[
     {from:1,to:99,sel:2,options:[
       {name:"Attack potions",req:3,xpPer:25,items:[{name:"Guam leaf",per:1},{name:"Eye of newt",per:1}]},
@@ -325,7 +350,10 @@ const SKILLS=[
       {name:"Wooden chairs",req:8,xpPer:87,items:[{name:"Plank",per:3}]},
       {name:"Oak chairs",req:19,xpPer:120,items:[{name:"Oak plank",per:2}]},
       {name:"Oak larders",req:33,xpPer:480,items:[{name:"Oak plank",per:8}]},
-      {name:"Mahogany tables",req:52,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]}]},
+      {name:"Mahogany tables",req:52,xpPer:840,items:[{name:"Mahogany plank",per:6}]},
+      {name:"Oak dungeon doors",req:74,xpPer:600,items:[{name:"Oak plank",per:10}]},
+      {name:"Mahogany Homes — teak (approx)",req:20,xpPer:118,items:[{name:"Teak plank",per:1},{name:"Steel bar",per:0.2}]},
+      {name:"Mahogany Homes — mahogany (approx)",req:50,xpPer:210,items:[{name:"Mahogany plank",per:1},{name:"Steel bar",per:0.3}]}]}]},
   {name:"Firemaking",cur:101470,bands:[
     {from:1,to:99,sel:4,options:[
       {name:"Burn logs",req:1,xpPer:40,items:[{name:"Logs",per:1}]},
@@ -335,7 +363,19 @@ const SKILLS=[
       {name:"Wintertodt",req:50,xpPer:0,items:[]},
       {name:"Burn yew logs",req:60,xpPer:202.5,items:[{name:"Yew logs",per:1}]},
       {name:"Burn magic logs",req:75,xpPer:303.8,items:[{name:"Magic logs",per:1}]},
-      {name:"Burn redwood logs",req:90,xpPer:350,items:[{name:"Redwood logs",per:1}]}]}]}
+      {name:"Burn redwood logs",req:90,xpPer:350,items:[{name:"Redwood logs",per:1}]}]}]},
+  {name:"Prayer",cur:0,bands:[
+    {from:1,to:99,sel:3,options:[
+      {name:"Bones (Gilded altar)",req:1,xpPer:15.75,items:[{name:"Bones",per:1}]},
+      {name:"Big bones (Gilded altar)",req:1,xpPer:52.5,items:[{name:"Big bones",per:1}]},
+      {name:"Dragon bones (bury)",req:1,xpPer:72,items:[{name:"Dragon bones",per:1}]},
+      {name:"Dragon bones (Gilded altar)",req:1,xpPer:252,items:[{name:"Dragon bones",per:1}]},
+      {name:"Dragon bones (Chaos altar)",req:1,xpPer:252,items:[{name:"Dragon bones",per:0.5}]},
+      {name:"Wyvern bones (Gilded altar)",req:1,xpPer:175,items:[{name:"Wyvern bones",per:1}]},
+      {name:"Dagannoth bones (Gilded altar)",req:1,xpPer:437.5,items:[{name:"Dagannoth bones",per:1}]},
+      {name:"Ourg bones (Gilded altar)",req:1,xpPer:490,items:[{name:"Ourg bones",per:1}]},
+      {name:"Superior dragon bones (Gilded altar)",req:1,xpPer:525,items:[{name:"Superior dragon bones",per:1}]},
+      {name:"Superior dragon bones (Chaos altar)",req:1,xpPer:525,items:[{name:"Superior dragon bones",per:0.5}]}]}]}
 ];
 const GATHER=[
   {name:"Woodcutting",cur:85},{name:"Fishing",cur:18294},{name:"Mining",cur:18813},
