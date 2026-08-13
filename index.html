@@ -86,6 +86,9 @@
   .band-ctl button{background:var(--stone-2);border:1px solid var(--line);color:var(--muted);width:22px;height:22px;border-radius:5px;cursor:pointer;font-size:15px;line-height:1;padding:0;font-family:var(--mono)}
   .band-ctl button:hover{border-color:var(--gold);color:var(--gold-bright)}
   .lvl-in.band-to{width:44px}
+  .add-row-wrap{padding:10px 16px}
+  button.add-row{background:var(--stone-2);border:1px dashed var(--line);color:var(--muted);font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:6px;cursor:pointer}
+  button.add-row:hover{border-color:var(--gold);color:var(--gold-bright)}
   .leg-done{opacity:.5}
   .gap-flag{font-family:var(--mono);font-size:11.5px;color:var(--red)}
 
@@ -175,7 +178,7 @@
 
   <section>
     <h2 class="sec-title">Supply skills — pick a method per level band</h2>
-    <p class="note">Each row is a level range. Pick its method, edit its end level, or hit <b>+</b> to split a range so you can switch methods partway — e.g. Prayer potions to 76, then Magic potions to 99. Use <b>×</b> to merge a range back.</p>
+    <p class="note">Each row is a level range. Pick its method and edit its end level. Click <b>+ add row</b> to append a new stretch (it ends at 99) — then set the previous row's end where you want to switch, e.g. Prayer potions to 76, then Magic potions to 99. Use <b>×</b> to remove a row.</p>
     <div id="skills"></div>
   </section>
 
@@ -409,7 +412,7 @@ function renderSkills(){
           <span class="cost" data-out="cost-${si}-${bi}-${ii}"></span></div>`).join("");
       const isLast=bi===sk.bands.length-1;
       const toHtml=isLast?`<b>99</b>`:`<input class="lvl-in band-to" type="number" min="${b.from+1}" max="98" data-si="${si}" data-bi="${bi}" value="${b.to}">`;
-      const ctl=`<span class="band-ctl"><button class="band-split" data-si="${si}" data-bi="${bi}" title="Split this range in two">+</button>${sk.bands.length>1?`<button class="band-remove" data-si="${si}" data-bi="${bi}" title="Remove this range">×</button>`:""}</span>`;
+      const ctl=sk.bands.length>1?`<span class="band-ctl"><button class="band-remove" data-si="${si}" data-bi="${bi}" title="Remove this row">×</button></span>`:"";
       return `<div class="leg${done?" leg-done":""}"><div class="leg-top">
           <span class="leg-range">lvl ${b.from}→${toHtml}</span>
           <select class="band-sel" data-si="${si}" data-bi="${bi}">${opts}</select>${gap}${ctl}
@@ -424,7 +427,9 @@ function renderSkills(){
           <span class="xp-rem">${rem>0?fmt(rem)+" xp to go":"99 — done"}</span>
           <span class="skill-sub" data-out="sub-${si}"></span>
         </div>
-        ${bands}</div>`;
+        ${bands}
+        <div class="add-row-wrap"><button class="add-row" data-si="${si}">+ add row (to 99)</button></div>
+      </div>`;
   }).join("");
 }
 
@@ -578,15 +583,15 @@ document.addEventListener("change",e=>{
     else if(String(lv)!==t.value){ t.value=lv; }
   }
 });
-// split a range into two (so you can switch methods partway), or remove a range (merge into neighbour)
+// add a new row (a new stretch ending at 99, carved off the last row), or remove a row (merge into neighbour)
 document.addEventListener("click",e=>{
   const t=e.target;
-  if(t.classList.contains("band-split")){
-    const sk=SKILLS[+t.dataset.si], bi=+t.dataset.bi, b=sk.bands[bi];
-    if(b.to-b.from<2) return; // too small to split
-    const mid=Math.floor((b.from+b.to)/2);
-    const copy=JSON.parse(JSON.stringify({from:mid,to:b.to,sel:b.sel,options:b.options}));
-    b.to=mid; sk.bands.splice(bi+1,0,copy);
+  if(t.classList.contains("add-row")){
+    const sk=SKILLS[+t.dataset.si], last=sk.bands[sk.bands.length-1];
+    if(last.to-last.from<2) return; // no room left to add another row
+    const mid=Math.floor((last.from+last.to)/2);
+    const copy=JSON.parse(JSON.stringify({from:mid,to:last.to,sel:last.sel,options:last.options}));
+    last.to=mid; sk.bands.push(copy);
     renderSkills(); refresh();
   } else if(t.classList.contains("band-remove")){
     const sk=SKILLS[+t.dataset.si], bi=+t.dataset.bi; if(sk.bands.length<=1) return;
