@@ -178,7 +178,7 @@
 
   <section>
     <h2 class="sec-title">Supply skills — pick a method per level band</h2>
-    <p class="note">Each row is a level range. Pick its method and edit its end level. Click <b>+ add row</b> to append a new stretch (it ends at 99) — then set the previous row's end where you want to switch, e.g. Prayer potions to 76, then Magic potions to 99. Use <b>×</b> to remove a row.</p>
+    <p class="note">Each skill starts as one row from 1→99 — pick its method. Click <b>+ add row</b> to append another stretch (it ends at 99 and starts where the previous row ends); set the previous row's end level where you want to switch, e.g. Prayer potions to 76, then Magic potions to 99. Use <b>×</b> to remove a row.</p>
     <div id="skills"></div>
   </section>
 
@@ -258,12 +258,10 @@ const ITEM_IDS={
 
 const SKILLS=[
   {name:"Cooking",cur:2753655,bands:[
-    {from:1,to:15,sel:0,options:[
-      {name:"Cook shrimps",req:1,xpPer:30,items:[{name:"Raw shrimps",per:1}]}]},
-    {from:15,to:30,sel:0,options:[
+    {from:1,to:99,sel:0,options:[
+      {name:"Cook shrimps",req:1,xpPer:30,items:[{name:"Raw shrimps",per:1}]},
       {name:"Cook trout",req:15,xpPer:70,items:[{name:"Raw trout",per:1}]},
-      {name:"Cook salmon",req:25,xpPer:90,items:[{name:"Raw salmon",per:1}]}]},
-    {from:30,to:99,sel:0,options:[
+      {name:"Cook salmon",req:25,xpPer:90,items:[{name:"Raw salmon",per:1}]},
       {name:"Cook karambwans",req:30,xpPer:190,items:[{name:"Raw karambwan",per:1}]},
       {name:"Jugs of wine",req:35,xpPer:200,items:[{name:"Grapes",per:1},{name:"Jug of water",per:1}]},
       {name:"Cook lobsters",req:40,xpPer:120,items:[{name:"Raw lobster",per:1}]},
@@ -273,59 +271,45 @@ const SKILLS=[
       {name:"Cook anglerfish",req:84,xpPer:230,items:[{name:"Raw anglerfish",per:1}]},
       {name:"Summer pies",req:95,xpPer:260,items:[{name:"Raw summer pie",per:1}]}]}]},
   {name:"Fletching",cur:408813,bands:[
-    {from:1,to:20,sel:0,options:[
-      {name:"Shortbows",req:5,xpPer:10,items:[{name:"Logs",per:1},{name:"Bow string",per:1}]}]},
-    {from:20,to:40,sel:0,options:[
+    {from:1,to:99,sel:0,options:[
+      {name:"Shortbows",req:5,xpPer:10,items:[{name:"Logs",per:1},{name:"Bow string",per:1}]},
       {name:"Oak shortbows",req:20,xpPer:33,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]},
-      {name:"Oak longbows",req:25,xpPer:50,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]}]},
-    {from:40,to:55,sel:0,options:[
-      {name:"Willow longbows",req:40,xpPer:83,items:[{name:"Willow logs",per:1},{name:"Bow string",per:1}]}]},
-    {from:55,to:70,sel:0,options:[
-      {name:"Maple longbows",req:55,xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]}]},
-    {from:70,to:99,sel:0,options:[
-      {name:"Yew longbows",req:70,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]},
-      {name:"Magic longbows",req:85,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]},
+      {name:"Oak longbows",req:25,xpPer:50,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]},
+      {name:"Willow longbows",req:40,xpPer:83,items:[{name:"Willow logs",per:1},{name:"Bow string",per:1}]},
+      {name:"Maple longbows",req:55,xpPer:116.6,items:[{name:"Maple logs",per:1},{name:"Bow string",per:1}]},
       {name:"Adamant darts",req:67,xpPer:15,items:[{name:"Adamant dart tip",per:1},{name:"Feather",per:1}]},
+      {name:"Yew longbows",req:70,xpPer:135,items:[{name:"Yew logs",per:1},{name:"Bow string",per:1}]},
       {name:"Rune darts",req:81,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]},
+      {name:"Magic longbows",req:85,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]},
       {name:"Dragon darts",req:95,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]}]},
   {name:"Crafting",cur:3002,bands:[
-    {from:1,to:20,sel:0,options:[
+    {from:1,to:99,sel:0,options:[
       {name:"Leather gloves",req:1,xpPer:13.8,items:[{name:"Leather",per:1}]},
-      {name:"Leather bodies",req:14,xpPer:25,items:[{name:"Leather",per:1}]}]},
-    {from:20,to:43,sel:0,options:[
+      {name:"Leather bodies",req:14,xpPer:25,items:[{name:"Leather",per:1}]},
       {name:"Cut sapphires",req:20,xpPer:50,items:[{name:"Uncut sapphire",per:1}]},
       {name:"Cut emeralds",req:27,xpPer:67.5,items:[{name:"Uncut emerald",per:1}]},
-      {name:"Cut rubies",req:34,xpPer:85,items:[{name:"Uncut ruby",per:1}]}]},
-    {from:43,to:63,sel:0,options:[
+      {name:"Cut rubies",req:34,xpPer:85,items:[{name:"Uncut ruby",per:1}]},
       {name:"Cut diamonds",req:43,xpPer:107.5,items:[{name:"Uncut diamond",per:1}]},
-      {name:"Cut dragonstones",req:55,xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]},
-    {from:63,to:99,sel:0,options:[
+      {name:"Cut dragonstones",req:55,xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]},
       {name:"Green d'hide bodies",req:63,xpPer:148,items:[{name:"Green dragon leather",per:3}]},
+      {name:"Air battlestaves",req:66,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]},
       {name:"Blue d'hide bodies",req:66,xpPer:210,items:[{name:"Blue dragon leather",per:3}]},
       {name:"Red d'hide bodies",req:73,xpPer:258,items:[{name:"Red dragon leather",per:3}]},
-      {name:"Black d'hide bodies",req:79,xpPer:306,items:[{name:"Black dragon leather",per:3}]},
-      {name:"Air battlestaves",req:66,xpPer:137.5,items:[{name:"Battlestaff",per:1},{name:"Air orb",per:1}]},
-      {name:"Cut dragonstones",req:55,xpPer:137.5,items:[{name:"Uncut dragonstone",per:1}]}]}]},
+      {name:"Black d'hide bodies",req:79,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]}]},
   {name:"Smithing",cur:12743,bands:[
-    {from:1,to:30,sel:0,options:[
+    {from:1,to:99,sel:0,options:[
       {name:"Bronze bars",req:1,xpPer:6.2,items:[{name:"Copper ore",per:1},{name:"Tin ore",per:1}]},
-      {name:"Iron bars",req:15,xpPer:12.5,items:[{name:"Iron ore",per:1}]}]},
-    {from:30,to:50,sel:0,options:[
+      {name:"Iron bars",req:15,xpPer:12.5,items:[{name:"Iron ore",per:1}]},
       {name:"Steel bars",req:30,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]},
       {name:"Cannonballs",req:35,xpPer:25.6,items:[{name:"Steel bar",per:1}]},
-      {name:"Gold bars",req:40,xpPer:56.2,items:[{name:"Gold ore",per:1}]}]},
-    {from:50,to:99,sel:0,options:[
       {name:"Gold bars",req:40,xpPer:56.2,items:[{name:"Gold ore",per:1}]},
       {name:"Mithril bars",req:50,xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]},
       {name:"Adamant bars",req:70,xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]},
-      {name:"Rune bars",req:85,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]},
-      {name:"Cannonballs",req:35,xpPer:25.6,items:[{name:"Steel bar",per:1}]}]}]},
+      {name:"Rune bars",req:85,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]}]},
   {name:"Herblore",cur:4045,bands:[
-    {from:1,to:12,sel:0,options:[
-      {name:"Attack potions",req:3,xpPer:25,items:[{name:"Guam leaf",per:1},{name:"Eye of newt",per:1}]}]},
-    {from:12,to:38,sel:0,options:[
-      {name:"Strength potions",req:12,xpPer:50,items:[{name:"Tarromin",per:1},{name:"Limpwurt root",per:1}]}]},
-    {from:38,to:99,sel:0,options:[
+    {from:1,to:99,sel:0,options:[
+      {name:"Attack potions",req:3,xpPer:25,items:[{name:"Guam leaf",per:1},{name:"Eye of newt",per:1}]},
+      {name:"Strength potions",req:12,xpPer:50,items:[{name:"Tarromin",per:1},{name:"Limpwurt root",per:1}]},
       {name:"Prayer potions",req:38,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]},
       {name:"Super strength",req:55,xpPer:125,items:[{name:"Kwuarm",per:1},{name:"Limpwurt root",per:1}]},
       {name:"Super restores",req:63,xpPer:142.5,items:[{name:"Snapdragon",per:1},{name:"Red spiders' eggs",per:1}]},
@@ -335,26 +319,19 @@ const SKILLS=[
       {name:"Saradomin brews",req:81,xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]},
       {name:"Super combat",req:90,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]}]},
   {name:"Construction",cur:939,bands:[
-    {from:1,to:33,sel:0,options:[
+    {from:1,to:99,sel:0,options:[
       {name:"Crude wooden chairs",req:1,xpPer:58,items:[{name:"Plank",per:2}]},
       {name:"Wooden chairs",req:8,xpPer:87,items:[{name:"Plank",per:3}]},
-      {name:"Oak chairs",req:19,xpPer:120,items:[{name:"Oak plank",per:2}]}]},
-    {from:33,to:52,sel:0,options:[
-      {name:"Oak larders",req:33,xpPer:480,items:[{name:"Oak plank",per:8}]}]},
-    {from:52,to:99,sel:0,options:[
-      {name:"Mahogany tables",req:52,xpPer:840,items:[{name:"Mahogany plank",per:6}]},
-      {name:"Oak larders",req:33,xpPer:480,items:[{name:"Oak plank",per:8}]}]}]},
+      {name:"Oak chairs",req:19,xpPer:120,items:[{name:"Oak plank",per:2}]},
+      {name:"Oak larders",req:33,xpPer:480,items:[{name:"Oak plank",per:8}]},
+      {name:"Mahogany tables",req:52,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]}]},
   {name:"Firemaking",cur:101470,bands:[
-    {from:1,to:15,sel:0,options:[
-      {name:"Burn logs",req:1,xpPer:40,items:[{name:"Logs",per:1}]}]},
-    {from:15,to:30,sel:0,options:[
-      {name:"Burn oak logs",req:15,xpPer:60,items:[{name:"Oak logs",per:1}]}]},
-    {from:30,to:50,sel:0,options:[
+    {from:1,to:99,sel:0,options:[
+      {name:"Burn logs",req:1,xpPer:40,items:[{name:"Logs",per:1}]},
+      {name:"Burn oak logs",req:15,xpPer:60,items:[{name:"Oak logs",per:1}]},
       {name:"Burn willow logs",req:30,xpPer:90,items:[{name:"Willow logs",per:1}]},
-      {name:"Burn maple logs",req:45,xpPer:135,items:[{name:"Maple logs",per:1}]}]},
-    {from:50,to:99,sel:0,options:[
-      {name:"Wintertodt",req:50,xpPer:0,items:[]},
       {name:"Burn maple logs",req:45,xpPer:135,items:[{name:"Maple logs",per:1}]},
+      {name:"Wintertodt",req:50,xpPer:0,items:[]},
       {name:"Burn yew logs",req:60,xpPer:202.5,items:[{name:"Yew logs",per:1}]},
       {name:"Burn magic logs",req:75,xpPer:303.8,items:[{name:"Magic logs",per:1}]},
       {name:"Burn redwood logs",req:90,xpPer:350,items:[{name:"Redwood logs",per:1}]}]}]}
