@@ -75,6 +75,9 @@
   .lvl-in{width:46px;background:var(--stone);border:1px solid var(--line);color:var(--gold-bright);font-family:var(--mono);font-size:13px;text-align:center;padding:3px 4px;border-radius:5px}
   .lvl-in:focus{outline:none;border-color:var(--gold)}
   .xp-rem{font-family:var(--mono);font-size:12px;color:var(--muted)}
+  .resale-wrap{font-family:var(--mono);font-size:11px;color:var(--dim);display:inline-flex;align-items:center;gap:4px}
+  .resale-in{width:44px;background:var(--stone);border:1px solid var(--line);color:var(--parch);font-family:var(--mono);font-size:12px;text-align:center;padding:3px 4px;border-radius:5px}
+  .resale-in:focus{outline:none;border-color:var(--gold)}
   .skill-sub{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--gold-bright);font-weight:700}
   .method-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
   .method-bar label{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
@@ -141,6 +144,7 @@
           <div class="btn-row">
             <button class="act" id="btn-json">Update from JSON</button>
             <button class="act ghost" id="btn-reset">Reset to loaded stats</button>
+            <button class="act ghost" id="btn-clear" title="Wipe the saved plan, prices and levels from this browser">Clear saved</button>
           </div>
         </div>
         <div class="sp-block">
@@ -159,6 +163,7 @@
   <div class="total-card">
     <div><div class="lbl">Total supply cost</div><div class="big" id="grand-compact">—</div></div>
     <div style="align-self:flex-end"><div class="exact" id="grand-exact"></div></div>
+    <div style="align-self:flex-end;margin-left:auto;text-align:right"><div class="lbl">Net after resale</div><div class="big" id="grand-net" style="font-size:clamp(20px,3.5vw,28px)">—</div><div class="exact" id="grand-net-note">est. incl. 2% GE sell tax</div></div>
   </div>
 
   <section>
@@ -257,8 +262,8 @@ const ITEM_IDS={
 };
 
 const SKILLS=[
-  {name:"Cooking",cur:2753655,bands:[
-    {from:1,to:99,sel:0,options:[
+  {name:"Cooking",cur:2753655,resale:85,bands:[
+    {from:1,to:99,sel:3,options:[
       {name:"Cook shrimps",req:1,xpPer:30,items:[{name:"Raw shrimps",per:1}]},
       {name:"Cook trout",req:15,xpPer:70,items:[{name:"Raw trout",per:1}]},
       {name:"Cook salmon",req:25,xpPer:90,items:[{name:"Raw salmon",per:1}]},
@@ -270,8 +275,8 @@ const SKILLS=[
       {name:"Cook sharks",req:80,xpPer:210,items:[{name:"Raw shark",per:1}]},
       {name:"Cook anglerfish",req:84,xpPer:230,items:[{name:"Raw anglerfish",per:1}]},
       {name:"Summer pies",req:95,xpPer:260,items:[{name:"Raw summer pie",per:1}]}]}]},
-  {name:"Fletching",cur:408813,bands:[
-    {from:1,to:99,sel:0,options:[
+  {name:"Fletching",cur:408813,resale:85,bands:[
+    {from:1,to:99,sel:6,options:[
       {name:"Shortbows",req:5,xpPer:10,items:[{name:"Logs",per:1},{name:"Bow string",per:1}]},
       {name:"Oak shortbows",req:20,xpPer:33,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]},
       {name:"Oak longbows",req:25,xpPer:50,items:[{name:"Oak logs",per:1},{name:"Bow string",per:1}]},
@@ -282,8 +287,8 @@ const SKILLS=[
       {name:"Rune darts",req:81,xpPer:18.8,items:[{name:"Rune dart tip",per:1},{name:"Feather",per:1}]},
       {name:"Magic longbows",req:85,xpPer:183,items:[{name:"Magic logs",per:1},{name:"Bow string",per:1}]},
       {name:"Dragon darts",req:95,xpPer:25,items:[{name:"Dragon dart tip",per:1},{name:"Feather",per:1}]}]}]},
-  {name:"Crafting",cur:3002,bands:[
-    {from:1,to:99,sel:0,options:[
+  {name:"Crafting",cur:3002,resale:85,bands:[
+    {from:1,to:99,sel:11,options:[
       {name:"Leather gloves",req:1,xpPer:13.8,items:[{name:"Leather",per:1}]},
       {name:"Leather bodies",req:14,xpPer:25,items:[{name:"Leather",per:1}]},
       {name:"Cut sapphires",req:20,xpPer:50,items:[{name:"Uncut sapphire",per:1}]},
@@ -296,8 +301,8 @@ const SKILLS=[
       {name:"Blue d'hide bodies",req:66,xpPer:210,items:[{name:"Blue dragon leather",per:3}]},
       {name:"Red d'hide bodies",req:73,xpPer:258,items:[{name:"Red dragon leather",per:3}]},
       {name:"Black d'hide bodies",req:79,xpPer:306,items:[{name:"Black dragon leather",per:3}]}]}]},
-  {name:"Smithing",cur:12743,bands:[
-    {from:1,to:99,sel:0,options:[
+  {name:"Smithing",cur:12743,resale:90,bands:[
+    {from:1,to:99,sel:4,options:[
       {name:"Bronze bars",req:1,xpPer:6.2,items:[{name:"Copper ore",per:1},{name:"Tin ore",per:1}]},
       {name:"Iron bars",req:15,xpPer:12.5,items:[{name:"Iron ore",per:1}]},
       {name:"Steel bars",req:30,xpPer:17.5,items:[{name:"Iron ore",per:1},{name:"Coal",per:1}]},
@@ -306,8 +311,8 @@ const SKILLS=[
       {name:"Mithril bars",req:50,xpPer:30,items:[{name:"Mithril ore",per:1},{name:"Coal",per:1}]},
       {name:"Adamant bars",req:70,xpPer:37.5,items:[{name:"Adamantite ore",per:1},{name:"Coal",per:3}]},
       {name:"Rune bars",req:85,xpPer:50,items:[{name:"Runite ore",per:1},{name:"Coal",per:4}]}]}]},
-  {name:"Herblore",cur:4045,bands:[
-    {from:1,to:99,sel:0,options:[
+  {name:"Herblore",cur:4045,resale:95,bands:[
+    {from:1,to:99,sel:2,options:[
       {name:"Attack potions",req:3,xpPer:25,items:[{name:"Guam leaf",per:1},{name:"Eye of newt",per:1}]},
       {name:"Strength potions",req:12,xpPer:50,items:[{name:"Tarromin",per:1},{name:"Limpwurt root",per:1}]},
       {name:"Prayer potions",req:38,xpPer:142.5,items:[{name:"Ranarr weed",per:1},{name:"Snape grass",per:1}]},
@@ -318,15 +323,15 @@ const SKILLS=[
       {name:"Magic potions",req:76,xpPer:172.5,items:[{name:"Lantadyme",per:1},{name:"Potato cactus",per:1}]},
       {name:"Saradomin brews",req:81,xpPer:180,items:[{name:"Toadflax",per:1},{name:"Crushed nest",per:1}]},
       {name:"Super combat",req:90,xpPer:150,items:[{name:"Super attack(4)",per:1},{name:"Super strength(4)",per:1},{name:"Super defence(4)",per:1},{name:"Torstol",per:1}]}]}]},
-  {name:"Construction",cur:939,bands:[
-    {from:1,to:99,sel:0,options:[
+  {name:"Construction",cur:939,resale:0,bands:[
+    {from:1,to:99,sel:4,options:[
       {name:"Crude wooden chairs",req:1,xpPer:58,items:[{name:"Plank",per:2}]},
       {name:"Wooden chairs",req:8,xpPer:87,items:[{name:"Plank",per:3}]},
       {name:"Oak chairs",req:19,xpPer:120,items:[{name:"Oak plank",per:2}]},
       {name:"Oak larders",req:33,xpPer:480,items:[{name:"Oak plank",per:8}]},
       {name:"Mahogany tables",req:52,xpPer:840,items:[{name:"Mahogany plank",per:6}]}]}]},
-  {name:"Firemaking",cur:101470,bands:[
-    {from:1,to:99,sel:0,options:[
+  {name:"Firemaking",cur:101470,resale:0,bands:[
+    {from:1,to:99,sel:4,options:[
       {name:"Burn logs",req:1,xpPer:40,items:[{name:"Logs",per:1}]},
       {name:"Burn oak logs",req:15,xpPer:60,items:[{name:"Oak logs",per:1}]},
       {name:"Burn willow logs",req:30,xpPer:90,items:[{name:"Willow logs",per:1}]},
@@ -402,6 +407,7 @@ function renderSkills(){
           <span class="skill-name">${sk.name}</span>
           <span class="lvl-wrap">lvl <input class="lvl-in" type="number" min="1" max="99" data-lvl="${si}" value="${lvl}"> → 99</span>
           <span class="xp-rem">${rem>0?fmt(rem)+" xp to go":"99 — done"}</span>
+          <span class="resale-wrap">sells back <input class="resale-in" type="number" min="0" max="100" step="5" data-resale="${si}" value="${sk.resale}">%</span>
           <span class="skill-sub" data-out="sub-${si}"></span>
         </div>
         ${bands}
@@ -435,6 +441,8 @@ function refresh(){
   const {itemTotals,grand}=compute();
   document.getElementById("grand-compact").textContent=gpCompact(grand)+" gp";
   document.getElementById("grand-exact").innerHTML=`<span class="coins">${fmt(grand)}</span> gp exact`;
+  let net=0; SKILLS.forEach(sk=>net+=sk._sub*(1-(sk.resale||0)/100*0.98)); // recovered amount is taxed 2% on resale
+  const netEl=document.getElementById("grand-net"); if(netEl) netEl.textContent=gpCompact(Math.max(0,net))+" gp";
   SKILLS.forEach((sk,si)=>{
     const subEl=document.querySelector(`[data-out="sub-${si}"]`);
     if(subEl) subEl.textContent=sk._sub>0?gpCompact(sk._sub)+" gp":"free";
@@ -462,6 +470,7 @@ function refresh(){
   });
   document.getElementById("foot-qty").textContent=fmt(fq);
   document.getElementById("foot-cost").textContent=fmt(fc);
+  saveState();
 }
 
 // ---- stat updating ----
@@ -541,6 +550,7 @@ document.addEventListener("input",e=>{
     else if(t.dataset.f==="per") opt.items[+t.dataset.ii].per=parseFloat(t.value)||0;
     refresh();
   } else if(t.dataset.price){ PRICES[t.dataset.price]=parseFloat(t.value)||0; refresh(); }
+  else if(t.dataset.resale!==undefined){ SKILLS[+t.dataset.resale].resale=Math.max(0,Math.min(100,parseFloat(t.value)||0)); refresh(); }
 });
 document.addEventListener("change",e=>{
   const t=e.target;
@@ -617,6 +627,38 @@ function copyList(){
 document.getElementById("btn-prices").addEventListener("click",fetchGEPrices);
 document.getElementById("btn-copy").addEventListener("click",copyList);
 
+// ---- persistence (localStorage): plan, prices, levels and resale % survive reloads ----
+const LS_KEY="osrs-planner-state-v1";
+function saveState(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      acct: document.getElementById("acct-name").textContent,
+      prices: PRICES,
+      skills: SKILLS.map(s=>({name:s.name,cur:s.cur,resale:s.resale,bands:s.bands})),
+      stats: [...GATHER,...SPECIAL].map(s=>({name:s.name,cur:s.cur}))
+    }));
+  }catch(_){}
+}
+function loadState(){
+  try{
+    const raw=localStorage.getItem(LS_KEY); if(!raw) return;
+    const s=JSON.parse(raw);
+    if(s.prices&&typeof s.prices==="object") Object.assign(PRICES, s.prices);
+    if(Array.isArray(s.skills)) s.skills.forEach(ss=>{ const sk=SKILLS.find(x=>x.name===ss.name); if(!sk) return;
+      if(typeof ss.cur==="number") sk.cur=ss.cur;
+      if(typeof ss.resale==="number") sk.resale=ss.resale;
+      if(Array.isArray(ss.bands)&&ss.bands.length) sk.bands=ss.bands;
+    });
+    if(Array.isArray(s.stats)) s.stats.forEach(ss=>{ for(const arr of [GATHER,SPECIAL]){ const o=arr.find(x=>x.name===ss.name); if(o&&typeof ss.cur==="number") o.cur=ss.cur; } });
+    if(typeof s.acct==="string"&&s.acct){ const el=document.getElementById("acct-name"); if(el) el.textContent=s.acct; const r=document.getElementById("rsn-in"); if(r) r.value=s.acct; }
+  }catch(_){}
+}
+document.getElementById("btn-clear").addEventListener("click",()=>{
+  try{ localStorage.removeItem(LS_KEY); }catch(_){}
+  location.reload();
+});
+
+loadState();
 renderSkills(); renderGather(); renderShop(compute().itemTotals); refresh();
 </script>
 </body>
